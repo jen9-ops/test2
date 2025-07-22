@@ -1,67 +1,71 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
   <title>Hyper-Bot</title>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 
-  <!-- 1. локальная библиотека -->
+  <!-- 1. Локальная библиотека Transformers.js -->
   <script src="transformers.min.js"></script>
-
-  <!-- 2. основной код -->
+  <!-- 2. Основной код -->
   <script src="app.js" defer></script>
 </head>
 <body>
-
-  <!-- █  NAVBAR  █ -->
+  <!-- ░ NAVBAR ░ -->
   <nav class="navbar">
     <span class="brand">🤖 Hyper-Bot</span>
     <span id="progress" class="badge">0 %</span>
 
-    <button id="menuBtn" class="menu-btn">≡</button>
+    <button id="menuBtn" class="menu-btn" aria-label="Меню">≡</button>
 
-    <div id="menu" class="dropdown">
-      <button onclick="showTrainText()">📝 Обучить текстом</button>
-      <button onclick="showTrainURL()">🔗 Обучить URL</button>
-      <button onclick="showAnalysis()">📊 Анализ</button>
+    <div id="menu" class="dropdown hidden" role="menu">
+      <button data-act="trainText">📝 Обучить текстом</button>
+      <button data-act="trainURL">🔗 Обучить URL</button>
+      <button data-act="analysis">📊 Анализ</button>
       <hr>
-      <button onclick="exportData()">⬇ Скачать память</button>
-      <button onclick="document.getElementById('fileInp').click()">⬆ Загрузить память</button>
-      <button onclick="clearChat()">✖ Очистить чат</button>
-      <button onclick="clearMemory()" style="color:#f55">🗑 Очистить память</button>
+      <button data-act="export">⬇ Скачать память</button>
+      <button data-act="import">⬆ Загрузить память</button>
+      <button data-act="clearChat">✖ Очистить чат</button>
+      <button data-act="clearMemory" class="danger">🗑 Очистить память</button>
       <hr>
-      <button onclick="toggleTheme()">🌙 Тёмная тема</button>
+      <button data-act="theme">🌙 Тёмная тема</button>
     </div>
   </nav>
 
-  <input id="fileInp" type="file" accept=".json" hidden onchange="importData(event)">
+  <input id="fileInp" type="file" accept="application/json" class="hidden" />
 
-  <!-- █  TRAIN PANELS  █ -->
-  <section id="trainText" class="panel">
+  <!-- ░ TRAIN PANELS ░ -->
+  <section id="trainText" class="panel hidden">
     <textarea id="textInput" class="soft" placeholder="каждая строка: вопрос - ответ"></textarea>
-    <button onclick="trainFromText()">Обучить</button>
+    <div class="actions">
+      <button data-act="doTrainText">Обучить</button>
+      <button data-act="closePanels" class="ghost">Отмена</button>
+    </div>
   </section>
 
-  <section id="trainURL" class="panel">
-    <input id="urlInput" class="soft" placeholder="https://example.com/статья">
-    <button onclick="trainFromURL()">Загрузить</button>
+  <section id="trainURL" class="panel hidden">
+    <input id="urlInput" class="soft" placeholder="https://example.com/статья" />
+    <div class="actions">
+      <button data-act="doTrainURL">Загрузить</button>
+      <button data-act="closePanels" class="ghost">Отмена</button>
+    </div>
   </section>
 
-  <!-- █  CHAT  █ -->
+  <!-- ░ CHAT ░ -->
   <main id="chat" class="chat"></main>
 
-  <!-- █  INPUT  █ -->
+  <!-- ░ INPUT BAR ░ -->
   <footer class="inputbar">
     <textarea id="userInput" class="soft" placeholder="Shift+Enter — новая строка, Ctrl+Enter — отправить"></textarea>
-    <button onclick="ask()">➤</button>
+    <button id="sendBtn" aria-label="Отправить">➤</button>
   </footer>
 
-  <!-- GPT-badge -->
+  <!-- GPT badge -->
   <span id="aiIndicator" class="badge d-none">GPT-2</span>
 
-  <!-- █  INLINE CONSOLE  █ -->
+  <!-- ░ INLINE CONSOLE ░ -->
   <div id="dbgToggle">⇧ Console ⇧</div>
   <div id="dbgPanel">
     <pre id="dbgLog"></pre>
