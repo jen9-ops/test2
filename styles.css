@@ -103,6 +103,15 @@ input.soft{height:38px;padding:4px 8px;width:100%}
   background:#333;color:#0ff;border:none;border-radius:4px;padding:2px 6px;font-size:.75rem;
   flex:0 0 auto;
 }
+
+.dbg-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 8px;background:#111;border-bottom:1px solid #333;color:#0ff;
+  font-size:.8rem;
+  cursor:ns-resize;          /* ← визуально показываем, что можно тянуть */
+  touch-action:none;         /* чтобы touchmove не скроллил страницу */
+}
+#dbgPanel.dragging{transition:none;}
 #dbgCmd{
   flex:1 1 auto;background:#111;border:1px solid #555;color:#0f0;
   border-radius:4px;padding:2px 4px;font-size:.75rem;
