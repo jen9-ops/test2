@@ -3,119 +3,100 @@ html,
 body { height: 100%; }
 
 /* ============ TOKENS ============ */
-:root {
-  --user:     rgba( 76,175, 80,.35);
-  --bot:      rgba(255,255,255,.20);
-  --r:        12px;          /* border-radius */
-  --blur:     14px;          /* generic blur  */
+:root{
+  --user: rgba( 76,175, 80,.35);
+  --bot : rgba(255,255,255,.20);
+  --r   : 12px;
 
   /* “soft” inputs */
-  --soft-bg:  rgba(255,255,255,.08);
-  --soft-br:  rgba(255,255,255,.25);
+  --soft-bg: rgba(255,255,255,.08);
+  --soft-br: rgba(255,255,255,.25);
 }
 
 /* ============ BACKGROUND (LIGHT / DARK) ============ */
-body {
+body{
   background: radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
-  color: #f7f7f7;
+  color:#f7f7f7;
 }
-
-body.dark {
+body.dark{
   background: radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
-  color: #ffffff;
+  color:#ffffff;
 
   --soft-bg: rgba(255,255,255,.05);
   --soft-br: rgba(255,255,255,.35);
 }
 
-/* ============ GLASS PRESET ============ */
-.glass {
-  background: rgba(255,255,255,.05);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: var(--r);
+/* ============ NO-BLUR “PANELS” ============ */
+.glass{                                 /* просто полу-прозрачный блок   */
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--r);
 }
 
-/* ============ MENU BUTTON (BURGER) ============ */
-.menu-btn {
-  width: 42px; height: 42px; padding: 0;
-  display: grid; place-items: center;
-  background: var(--soft-bg);
-  border: 1px solid var(--soft-br);
-  border-radius: 50%;
-  color: #fff;
+/* ============ MENU BUTTON ============ */
+.menu-btn{
+  width:42px;height:42px;padding:0;
+  display:grid;place-items:center;
+  background:var(--soft-bg);
+  border:1px solid var(--soft-br);
+  border-radius:50%;
+  color:#fff;
 }
-.menu-btn:hover { background: rgba(255,255,255,.12); }
+.menu-btn:hover{background:rgba(255,255,255,.12);}
 
-/* ============ DROPDOWN (BLUR 8 px, OPAQUE) ============ */
-.dropdown-menu.glass {
-  min-width: 220px;
-  font-size: .9rem;
-  background: rgba(30,30,30,.65);          /* dark, 65 % */
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.25);
-  backdrop-filter: blur(8px) saturate(140%);
+/* ============ DROPDOWN  (без blur) ============ */
+.dropdown-menu.glass{
+  min-width:220px;
+  font-size:.9rem;
+  background:rgba(30,30,30,.85);   /* тёмная полупрозрачность */
+  color:#fff;
+  border:1px solid rgba(255,255,255,.25);
 }
-body:not(.dark) .dropdown-menu.glass {
-  background: rgba(255,255,255,.70);       /* light, 70 % */
-  color: #111;
+body:not(.dark) .dropdown-menu.glass{
+  background:rgba(255,255,255,.94);
+  color:#111;
 }
-.dropdown-item           { padding: .35rem .85rem; }
-.dropdown-item:hover     { background: rgba(255,255,255,.15); }
-body:not(.dark) .dropdown-item:hover { background: rgba(0,0,0,.06); }
+.dropdown-item{padding:.35rem .85rem}
+.dropdown-item:hover{background:rgba(255,255,255,.15)}
+body:not(.dark) .dropdown-item:hover{background:rgba(0,0,0,.08)}
 
-/* ============ SOFT INPUTS & TEXTAREA ============ */
+/* ============ SOFT INPUTS ============ */
 .form-control.soft,
-textarea.soft {
-  background: var(--soft-bg);
-  border: 1px solid var(--soft-br);
-  border-radius: var(--r);
-  color: inherit;
-  resize: vertical;
+textarea.soft{
+  background:var(--soft-bg);
+  border:1px solid var(--soft-br);
+  border-radius:var(--r);
+  color:inherit;
+  resize:vertical;
 }
 .form-control.soft::placeholder,
-textarea.soft::placeholder {
-  color: rgba(255,255,255,.72);             /* заметнее */
-}
-body:not(.dark) .form-control.soft::placeholder {
-  color: #495057;
-}
+textarea.soft::placeholder{color:rgba(255,255,255,.72);}
+body:not(.dark) .form-control.soft::placeholder{color:#495057;}
 
 /* ============ CHAT CONTAINER ============ */
-.chat {
-  display: flex; flex-direction: column;
-  gap: 10px; padding: 14px;
-  background: rgba(255,255,255,.05);
-  backdrop-filter: blur(var(--blur));
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: var(--r);
-  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+.chat{
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--r);
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
 }
-.chat:empty {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-.chat::-webkit-scrollbar       { width: 6px; }
-.chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,.3); border-radius: 3px; }
+.chat:empty{background:transparent;border:none;box-shadow:none;}
+.chat::-webkit-scrollbar{width:6px;}
+.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px;}
 
 /* ============ MESSAGE BUBBLES ============ */
-.msg {
-  max-width: 80%;
-  padding: 10px 12px;
-  border-radius: var(--r);
-  white-space: pre-wrap;
-  word-break: break-word;
-  animation: bubble .25s ease-out;
+.msg{
+  max-width:80%;padding:10px 12px;border-radius:var(--r);
+  white-space:pre-wrap;word-break:break-word;
+  animation:bubble .25s ease-out;
 }
-.user { align-self: flex-end; background: var(--user); }
-.bot  { align-self: flex-start; background: var(--bot); }
-
-@keyframes bubble {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
+.user{align-self:flex-end;background:var(--user);}
+.bot {align-self:flex-start;background:var(--bot);}
+@keyframes bubble{from{opacity:0;transform:translateY(10px)}
+                  to{opacity:1;transform:none}}
 
 /* ============ GPT-2 BADGE ============ */
-#aiIndicator { animation: pulse .9s infinite alternate; }
-@keyframes pulse { from { opacity:.6; } to { opacity:1; } }
+#aiIndicator{animation:pulse .9s infinite alternate;}
+@keyframes pulse{from{opacity:.6;} to{opacity:1;}}
