@@ -58,7 +58,7 @@ body.dark{
 
 /* ---------- DROPDOWN  (контраст в обеих темах) ---------- */
 .dropdown-menu.glass{
-  min-width:220px;font-size:.9rem;margin-top:.5rem; /* ↓ 8 px отступ от шапки */
+  min-width:220px;font-size:.9rem;margin-top:.20rem; /* ↓ 8 px отступ от шапки */
   border:1px solid rgba(255,255,255,.25);
 }
 body.dark .dropdown-menu.glass{
@@ -97,7 +97,7 @@ textarea.soft::placeholder{
   color:rgba(255,255,255,.85);       /* яркий placeholder */
 }
 body:not(.dark) .form-control.soft::placeholder{
-  color:#555;
+  color:#fff;
 }
 
 /* ---------- chat-контейнер ---------- */
