@@ -1,0 +1,26 @@
+:root{
+  --user:rgba(76,175,80,.35);
+  --bot: rgba(255,255,255,.20);
+  --radius:10px;
+}
+body.dark{
+  --bs-body-bg:#121212;
+  --bs-light:#1e1e1e;
+  color:#e0e0e0;
+}
+/* chat */
+.chat{
+  flex:1 1 auto; display:flex; flex-direction:column; gap:10px;
+  padding:12px; overflow-y:auto; border-radius:var(--radius);
+  background:var(--bs-light,#ffffff);
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.msg{
+  max-width:80%; padding:8px 10px; border-radius:var(--radius);
+  white-space:pre-wrap; word-wrap:break-word;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
+}
+.user{align-self:flex-end;background:var(--user);}
+.bot {align-self:flex-start;background:var(--bot);}
+body.dark .chat{background:#1e1e1e;box-shadow:none;}
+body.dark .msg{box-shadow:none;}
