@@ -1,4 +1,36 @@
-/* --- компактная кнопка меню ------------------------------------- */
+/* === токены === */
+:root{
+  --user:    rgba( 76,175, 80,.35);
+  --bot:     rgba(255,255,255,.20);
+  --radius:  12px;
+  --blur:    14px;
+  --soft-bg: rgba(255,255,255,.08);   /* фон soft-инпута (светлая) */
+  --soft-br: rgba(255,255,255,.25);   /* рамка soft-инпута (светлая) */
+}
+
+/* === фон === */
+body{
+  min-height:100vh;
+  background:radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
+  color:#f7f7f7;
+}
+body.dark{
+  background:radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
+  color:#ffffff;
+  --soft-bg: rgba(255,255,255,.05);
+  --soft-br: rgba(255,255,255,.35);
+}
+
+/* === glass-элементы === */
+.glass{
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(var(--blur));
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--radius);
+}
+.navbar.glass{border-radius:0 0 20px 20px;}
+
+/* === кнопка-гамбургер === */
 .menu-btn{
   width:40px;height:40px;
   display:grid;place-items:center;
@@ -7,26 +39,66 @@
   border-radius:50%;
   color:#fff;
 }
-body.dark .menu-btn{color:#fff;border-color:rgba(255,255,255,.4);}
+body.dark .menu-btn{border-color:rgba(255,255,255,.4);}
 
-/* --- dropdown цвета --------------------------------------------- */
-.dropdown-menu{
-  min-width:220px;font-size:.9rem;
-}
+/* === dropdown === */
 .dropdown-menu.glass{
   background:rgba(30,30,30,.85);
-  color:#fff;
+  color:#fff;font-size:.9rem;
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(var(--blur));
 }
-body:not(.dark) .dropdown-menu.glass{background:rgba(255,255,255,.97);color:#111;}
-.dropdown-item:hover{background:rgba(255,255,255,.15);}
-body:not(.dark) .dropdown-item:hover{background:rgba(0,0,0,.05);}
+body:not(.dark) .dropdown-menu.glass{
+  background:rgba(255,255,255,.97); color:#111;
+}
+.dropdown-item{padding:.35rem .85rem;}
+.dropdown-item:hover{
+  background:rgba(255,255,255,.15);
+}
+body:not(.dark) .dropdown-item:hover{
+  background:rgba(0,0,0,.05);
+}
 
-/* --- инпуты / textarea (soft) ----------------------------------- */
-.form-control.soft,textarea.soft{
+/* === soft-inputs === */
+.form-control.soft,
+textarea.soft{
   background:var(--soft-bg);
   border:1px solid var(--soft-br);
-  color:inherit;
+  color:inherit; border-radius:var(--radius);
 }
 .form-control.soft::placeholder,
 textarea.soft::placeholder{color:rgba(255,255,255,.55);}
-body:not(.dark) .form-control.soft::placeholder{color:#6c757d;}
+body:not(.dark) .form-control.soft::placeholder{
+  color:#6c757d;
+}
+
+/* === чат === */
+.chat{
+  flex:1; display:flex; flex-direction:column; gap:10px;
+  padding:14px; overflow-y:auto;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(var(--blur));
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--radius);
+  box-shadow:0 8px 32px rgba(0,0,0,.18);
+}
+.chat:empty{background:transparent;border:none;box-shadow:none;}
+
+/* === пузыри === */
+.msg{
+  max-width:80%; padding:10px 12px;
+  border-radius:var(--radius);
+  white-space:pre-wrap; word-break:break-word;
+  animation:bubble .25s ease-out;
+}
+.user{align-self:flex-end;background:var(--user);}
+.bot {align-self:flex-start;background:var(--bot);}
+@keyframes bubble{from{opacity:0;transform:translateY(10px)}
+                  to{opacity:1;transform:none}}
+
+/* === скроллбар (Chrome) === */
+.chat::-webkit-scrollbar{width:6px;}
+.chat::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.3); border-radius:3px;
+}
+.chat::-webkit-scrollbar-track{background:transparent;}
