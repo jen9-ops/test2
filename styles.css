@@ -58,7 +58,9 @@ body.dark{
 
 /* ---------- DROPDOWN  (контраст в обеих темах) ---------- */
 .dropdown-menu.glass{
-  min-width:220px;font-size:.9rem;margin-top:.20rem; /* ↓ 8 px отступ от шапки */
+  min-width:220px;font-size:.7rem;margin-top: 3%;
+	/* ↓ 8 px отступ от шапки */
+	margin-right: auto;
   border:1px solid rgba(255,255,255,.25);
 }
 body.dark .dropdown-menu.glass{
