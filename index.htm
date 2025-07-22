@@ -4,27 +4,32 @@
   <meta charset="UTF-8" />
   <title>Hyper-Bot 🎓</title>
 
-  <!-- запрет pinch-zoom -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0,
                  maximum-scale=1.0, user-scalable=no" />
   <link rel="icon" href="ico.ico" type="image/x-icon" />
 
-  <!-- Bootstrap 5 + кастом -->
+  <!-- Bootstrap & Bootstrap-Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         rel="stylesheet" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet">
 
-  <!-- GPT-2 small (Transformers.js) -->
+  <!-- Кастомный стиль -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- GPT-2 small -->
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js"></script>
 </head>
 
 <body>
   <!-- ══ NAVBAR ══ -->
-  <header class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+  <header class="navbar navbar-expand-lg glass shadow-sm">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Hyper-Bot 🎓</a>
-      <span id="progress" class="badge text-dark bg-warning">0 %</span>
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="bi bi-robot me-1"></i>Hyper-Bot
+      </a>
+      <span id="progress" class="badge bg-warning text-dark">0 %</span>
 
       <button class="navbar-toggler" type="button"
               data-bs-toggle="collapse" data-bs-target="#navBot">
@@ -32,22 +37,31 @@
       </button>
 
       <div class="collapse navbar-collapse justify-content-end" id="navBot">
-        <ul class="navbar-nav">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Действия</a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#" onclick="showTrainText()">Обучить по тексту</a></li>
-              <li><a class="dropdown-item" href="#" onclick="showTrainURL()">Обучить по URL</a></li>
-              <li><a class="dropdown-item" href="#" onclick="showAnalysis()">Показать анализ</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" onclick="exportData()">Скачать память</a></li>
-              <li><a class="dropdown-item" href="#" onclick="document.getElementById('fileInput').click()">Загрузить память</a></li>
-              <li><a class="dropdown-item" href="#" onclick="clearChat()">Очистить чат</a></li>
-              <!-- 🔥 Новый пункт -->
-              <li><a class="dropdown-item text-danger" href="#" onclick="clearMemory()">Очистить память</a></li>
-              <li><a class="dropdown-item" href="#" onclick="toggleTheme()">Тёмная тема</a></li>
-            </ul>
-          </li>
+        <ul class="navbar-nav gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showTrainText()">
+            <i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showTrainURL()">
+            <i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#" onclick="showAnalysis()">
+            <i class="bi bi-bar-chart me-1"></i>Анализ</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#" onclick="exportData()">
+            <i class="bi bi-download me-1"></i>Скачать память</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#"
+            onclick="document.getElementById('fileInput').click()">
+            <i class="bi bi-upload me-1"></i>Загрузить память</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#" onclick="clearChat()">
+            <i class="bi bi-x-circle me-1"></i>Очистить чат</a></li>
+
+          <li class="nav-item"><a class="nav-link text-danger" href="#" onclick="clearMemory()">
+            <i class="bi bi-trash3 me-1"></i>Очистить память</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="#" onclick="toggleTheme()">
+            <i class="bi bi-moon-stars me-1"></i>Тёмная тема</a></li>
         </ul>
       </div>
     </div>
@@ -59,18 +73,20 @@
     <section id="trainText" class="d-none">
       <textarea id="textInput" class="form-control mb-2"
                 placeholder="Вставь текст для обучения…"></textarea>
-      <button class="btn btn-primary" onclick="trainFromText(); hideSections();">Обучить</button>
+      <button class="btn btn-primary"
+              onclick="trainFromText(); hideSections();">Обучить</button>
     </section>
 
     <!-- обучение URL -->
     <section id="trainURL" class="d-none d-flex flex-wrap gap-2 align-items-start">
-      <input id="urlInput" class="form-control flex-grow-1" placeholder="Вставь URL для обучения">
+      <input id="urlInput" class="form-control flex-grow-1"
+             placeholder="Вставь URL для обучения">
       <button class="btn btn-primary"
               onclick="trainFromURL(); hideSections();">Загрузить URL</button>
     </section>
 
     <!-- чат -->
-    <div id="chat" class="chat"></div>
+    <div id="chat" class="chat glass"></div>
 
     <!-- строка ввода -->
     <div class="d-flex gap-2">
@@ -81,6 +97,7 @@
     </div>
   </main>
 
+  <!-- скрытый input -->
   <input id="fileInput" type="file" accept="application/json"
          class="d-none" onchange="importData(event)">
 
