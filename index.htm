@@ -4,116 +4,77 @@
   <meta charset="UTF-8" />
   <title>Hyper-Bot 🎓</title>
 
-  <!-- мобильная мета -->
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,
-                                 maximum-scale=1.0,user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link rel="icon" href="ico.ico" />
 
-  <!-- Bootstrap + Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-        rel="stylesheet">
+  <!-- Bootstrap + иконки -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js"></script>
 </head>
 
-<body>
-  <!-- ═════════════ NAVBAR ═════════════ -->
+<body class="d-flex flex-column h-100">
+  <!-- ═ NAVBAR ═ -->
   <header class="navbar glass shadow-sm px-3">
     <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
       <i class="bi bi-robot"></i> Hyper-Bot
-      <span id="progress"   class="badge bg-warning text-dark ms-1">0 %</span>
-      <span id="aiIndicator" class="badge bg-info   text-dark ms-1 d-none">GPT-2</span>
+      <span id="progress" class="badge bg-warning text-dark ms-1">0 %</span>
+      <span id="aiIndicator" class="badge bg-info text-dark ms-1 d-none">GPT-2</span>
     </a>
 
-    <!-- компактный бургер-dropdown -->
+    <!-- бургер-dropdown -->
     <div class="dropdown ms-auto">
-      <button class="menu-btn" data-bs-toggle="dropdown">
-        <!-- любой белый svg, положите рядом как hamburger.svg -->
-        <img src="hamburger.svg" alt="≡">
-      </button>
+      <button class="menu-btn" data-bs-toggle="dropdown"><img src="hamburger.svg" alt="≡"></button>
 
       <ul class="dropdown-menu dropdown-menu-end glass p-2 shadow-lg">
-        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlText">
-              <i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
-        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlURL">
-              <i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
-        <li><a class="dropdown-item" href="#" onclick="showAnalysis()">
-              <i class="bi bi-bar-chart me-1"></i>Анализ</a></li>
-
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlText"><i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlURL"><i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
+        <li><a class="dropdown-item" href="#" onclick="showAnalysis()"><i class="bi bi-bar-chart me-1"></i>Анализ</a></li>
         <li><hr class="dropdown-divider"></li>
-
-        <li><a class="dropdown-item" href="#" onclick="exportData()">
-              <i class="bi bi-download me-1"></i>Скачать память</a></li>
-        <li><a class="dropdown-item" href="#" onclick="document.getElementById('fileInput').click()">
-              <i class="bi bi-upload me-1"></i>Загрузить память</a></li>
-        <li><a class="dropdown-item" href="#" onclick="clearChat()">
-              <i class="bi bi-x-circle me-1"></i>Очистить чат</a></li>
-        <li><a class="dropdown-item text-danger" href="#" onclick="clearMemory()">
-              <i class="bi bi-trash3 me-1"></i>Очистить память</a></li>
-
+        <li><a class="dropdown-item" href="#" onclick="exportData()"><i class="bi bi-download me-1"></i>Скачать память</a></li>
+        <li><a class="dropdown-item" href="#" onclick="document.getElementById('fileInput').click()"><i class="bi bi-upload me-1"></i>Загрузить память</a></li>
+        <li><a class="dropdown-item" href="#" onclick="clearChat()"><i class="bi bi-x-circle me-1"></i>Очистить чат</a></li>
+        <li><a class="dropdown-item text-danger" href="#" onclick="clearMemory()"><i class="bi bi-trash3 me-1"></i>Очистить память</a></li>
         <li><hr class="dropdown-divider"></li>
-
-        <li><a class="dropdown-item" href="#" onclick="toggleTheme()">
-              <i class="bi bi-moon-stars me-1"></i>Тёмная тема</a></li>
+        <li><a class="dropdown-item" href="#" onclick="toggleTheme()"><i class="bi bi-moon-stars me-1"></i>Тёмная тема</a></li>
       </ul>
     </div>
   </header>
 
-  <!-- ═════════════ MAIN ═════════════ -->
+  <!-- ═ MAIN (flex-fill) ═ -->
   <main class="flex-grow-1 d-flex flex-column gap-2 p-3 overflow-hidden">
-    <div id="chat" class="chat glass"></div>
+    <div id="chat" class="chat glass flex-grow-1 overflow-auto"></div>
 
     <div class="d-flex gap-2">
-      <input id="userInput" class="form-control soft"
-             placeholder="Напиши сообщение…"
-             onkeydown="if(event.key==='Enter'){ask();}">
+      <input id="userInput" class="form-control soft" placeholder="Напиши сообщение…" onkeydown="if(event.key==='Enter'){ask();}">
       <button class="btn btn-primary" onclick="ask()">➤</button>
     </div>
   </main>
 
-  <!-- hidden file-input -->
-  <input id="fileInput" type="file" accept="application/json"
-         class="d-none" onchange="importData(event)">
+  <input id="fileInput" type="file" accept="application/json" class="d-none" onchange="importData(event)">
 
-  <!-- ═════════════ MODALS ═════════════ -->
-  <!-- текст -->
-  <div id="mdlText" class="modal fade">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content glass p-3">
-        <h5 class="modal-title mb-3">
-          <i class="bi bi-pencil-square me-2"></i>Обучить по тексту
-        </h5>
-        <textarea id="textInput" rows="6" class="form-control soft mb-3"
-                  placeholder="Вставь текст для обучения…"></textarea>
-        <div class="text-end">
-          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
-          <button class="btn btn-primary" data-bs-dismiss="modal"
-                  onclick="trainFromText()">Обучить</button>
-        </div>
+  <!-- ─── MODALS (text & URL) ─── -->
+  <div id="mdlText" class="modal fade"><div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content glass p-3">
+      <h5 class="modal-title mb-3"><i class="bi bi-pencil-square me-2"></i>Обучить по тексту</h5>
+      <textarea id="textInput" rows="6" class="form-control soft mb-3" placeholder="Вставь текст для обучения…"></textarea>
+      <div class="text-end">
+        <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+        <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromText()">Обучить</button>
       </div>
-    </div>
-  </div>
+    </div></div></div>
 
-  <!-- URL -->
-  <div id="mdlURL" class="modal fade">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-      <div class="modal-content glass p-3">
-        <h5 class="modal-title mb-3">
-          <i class="bi bi-link-45deg me-2"></i>Обучить по URL
-        </h5>
-        <input id="urlInput" class="form-control soft mb-3"
-               placeholder="https://пример.ru/статья">
-        <div class="text-end">
-          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
-          <button class="btn btn-primary" data-bs-dismiss="modal"
-                  onclick="trainFromURL()">Загрузить</button>
-        </div>
+  <div id="mdlURL" class="modal fade"><div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content glass p-3">
+      <h5 class="modal-title mb-3"><i class="bi bi-link-45deg me-2"></i>Обучить по URL</h5>
+      <input id="urlInput" class="form-control soft mb-3" placeholder="https://пример.ru/статья">
+      <div class="text-end">
+        <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+        <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromURL()">Загрузить</button>
       </div>
-    </div>
-  </div>
+    </div></div></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
