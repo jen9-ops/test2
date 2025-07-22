@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 920 260" xmlns="http://www.w3.org/2000/svg"
+     font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13"
+     text-anchor="start">
+  <style>
+    .h  { font-weight:bold; fill:#ffffff }
+    .c0 { fill:#2d3a8c }         /* header */
+    .c1 { fill:#4355b2 }         /* zebra 1 */
+    .c2 { fill:#5364c2 }         /* zebra 2 */
+    .stroke { stroke:#ffffff; stroke-width:1 }
+    .wrap  { white-space:pre-wrap }
+  </style>
+
+  <!-- Headers -->
+  <rect class="c0" x="0"  y="0"  width="240" height="44"/>
+  <rect class="c0" x="240" y="0" width="340" height="44"/>
+  <rect class="c0" x="580" y="0" width="340" height="44"/>
+  <text class="h" x="8"   y="26">Возможность</text>
+  <text class="h" x="248" y="26">Как работает сейчас</text>
+  <text class="h" x="588" y="26">Как «учить» / расширять</text>
+
+  <!-- Row 1 -->
+  <rect class="c1 stroke" x="0"   y="44"  width="240" height="44"/>
+  <rect class="c1 stroke" x="240" y="44"  width="340" height="44"/>
+  <rect class="c1 stroke" x="580" y="44"  width="340" height="44"/>
+  <text x="8"   y="70">Локальная база знаний</text>
+  <text x="248" y="70">Поиск ~35 % совпадения в KB</text>
+  <text x="588" y="58">«Обучить текстом» / URL / `вопрос - ответ`</text>
+
+  <!-- Row 2 -->
+  <rect class="c2 stroke" x="0"   y="88"  width="240" height="44"/>
+  <rect class="c2 stroke" x="240" y="88"  width="340" height="44"/>
+  <rect class="c2 stroke" x="580" y="88"  width="340" height="44"/>
+  <text x="8"   y="114">Шаблоны PowerShell</text>
+  <text x="248" y="114">4 регэкса (VHDX, BitLocker…)</text>
+  <text x="588" y="114">Расширяйте массив `templates`</text>
+
+  <!-- Row 3 -->
+  <rect class="c1 stroke" x="0"   y="132" width="240" height="44"/>
+  <rect class="c1 stroke" x="240" y="132" width="340" height="44"/>
+  <rect class="c1 stroke" x="580" y="132" width="340" height="44"/>
+  <text x="8"   y="158">mini-GPT-2 (WebGPU)</text>
+  <text x="248" y="154">Генерирует скрипт, если KB пусто</text>
+  <text x="588" y="154">Можно добавлять подсказки в промпт</text>
+
+  <!-- Row 4 -->
+  <rect class="c2 stroke" x="0"   y="176" width="240" height="44"/>
+  <rect class="c2 stroke" x="240" y="176" width="340" height="44"/>
+  <rect class="c2 stroke" x="580" y="176" width="340" height="44"/>
+  <text x="8"   y="202">Сохранение / импорт памяти</text>
+  <text x="248" y="202">JSON (KB+corpus) выгрузка / загрузка</text>
+  <text x="588" y="202">Резерв или обмен между устройствами</text>
+
+  <!-- Row 5 -->
+  <rect class="c1 stroke" x="0"   y="220" width="240" height="40"/>
+  <rect class="c1 stroke" x="240" y="220" width="340" height="40"/>
+  <rect class="c1 stroke" x="580" y="220" width="340" height="40"/>
+  <text x="8"   y="244">Тёмная тема + офлайн</text>
+  <text x="248" y="244">Полностью в браузере, 🌗 переключатель</text>
+  <text x="588" y="244">Правьте переменные в `styles.css`</text>
+</svg>
