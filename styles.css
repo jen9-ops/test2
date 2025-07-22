@@ -1,106 +1,71 @@
-/* базовые токены */
+html,body{height:100%}                     /* цепочка full-height */
+
+/* токены */
 :root{
-  --user:    rgba( 76,175, 80,.35);
-  --bot:     rgba(255,255,255,.20);
-  --radius:  12px;
-  --blur:    14px;
-  --soft-bg: rgba(255,255,255,.08);
-  --soft-br: rgba(255,255,255,.25);
+  --user:rgba(76,175,80,.35); --bot:rgba(255,255,255,.2);
+  --radius:12px; --blur:14px;
+  --soft-bg:rgba(255,255,255,.08); --soft-br:rgba(255,255,255,.25);
 }
 
 /* фон */
 body{
-  min-height:100vh;
-  display:flex;flex-direction:column;
-  background:radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
+  background:radial-gradient(circle at 20% 20%,#4e54c8 0%,#192f6a 100%);
   color:#f7f7f7;
 }
 body.dark{
-  background:radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
-  color:#ffffff;
-  --soft-bg: rgba(255,255,255,.05);
-  --soft-br: rgba(255,255,255,.35);
+  background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%);
+  color:#fff;
+  --soft-bg:rgba(255,255,255,.05); --soft-br:rgba(255,255,255,.35);
 }
 
-/* стекло */
+/* glass */
 .glass{
   background:rgba(255,255,255,.05);
   backdrop-filter:blur(var(--blur));
   border:1px solid rgba(255,255,255,.15);
   border-radius:var(--radius);
 }
-.navbar.glass{border-radius:0 0 20px 20px;}
 
-/* бургер */
+/* бургер-кнопка */
 .menu-btn{
-  width:44px;height:44px;padding:0;
+  width:42px;height:42px;padding:0;
   display:grid;place-items:center;
-  background:var(--soft-bg);
-  border:1px solid var(--soft-br);
-  border-radius:50%;
+  background:var(--soft-bg);border:1px solid var(--soft-br);border-radius:50%;
 }
-.menu-btn img{width:22px;height:22px;filter:invert(0);}
-body.dark .menu-btn img{filter:invert(1);}
-.menu-btn:hover{background:rgba(255,255,255,.12);}
+.menu-btn img{width:22px;height:22px;filter:invert(0)}
+body.dark .menu-btn img{filter:invert(1)}
 
 /* dropdown */
-.dropdown-menu.glass{
-  min-width:220px;font-size:.9rem;
-  background:rgba(30,30,30,.88);
-  color:#fff;
-  backdrop-filter:blur(var(--blur));
-  border:1px solid rgba(255,255,255,.12);
-}
-body:not(.dark) .dropdown-menu.glass{
-  background:rgba(255,255,255,.97);
-  color:#111;
-}
-.dropdown-item{padding:.35rem .85rem;}
-.dropdown-item:hover{
-  background:rgba(255,255,255,.15);
-}
-body:not(.dark) .dropdown-item:hover{
-  background:rgba(0,0,0,.06);
-}
+.dropdown-menu.glass{min-width:220px;font-size:.9rem;background:rgba(30,30,30,.88);color:#fff}
+body:not(.dark) .dropdown-menu.glass{background:rgba(255,255,255,.97);color:#111}
+.dropdown-item{padding:.35rem .85rem}
+.dropdown-item:hover{background:rgba(255,255,255,.15)}
+body:not(.dark) .dropdown-item:hover{background:rgba(0,0,0,.06)}
 
 /* soft-inputs */
-.form-control.soft,textarea.soft{
-  background:var(--soft-bg);
-  border:1px solid var(--soft-br);
-  border-radius:var(--radius);
-  color:inherit;
-}
-.form-control.soft::placeholder,
-textarea.soft::placeholder{color:rgba(255,255,255,.55);}
-body:not(.dark) .form-control.soft::placeholder{color:#6c757d;}
+.form-control.soft,textarea.soft{background:var(--soft-bg);border:1px solid var(--soft-br);border-radius:var(--radius);color:inherit}
+.form-control.soft::placeholder,textarea.soft::placeholder{color:rgba(255,255,255,.55)}
+body:not(.dark) .form-control.soft::placeholder{color:#6c757d}
 
 /* чат */
 .chat{
-  flex:1;display:flex;flex-direction:column;gap:10px;
-  padding:14px;overflow-y:auto;
   background:rgba(255,255,255,.05);
   backdrop-filter:blur(var(--blur));
   border:1px solid rgba(255,255,255,.15);
   border-radius:var(--radius);
   box-shadow:0 8px 32px rgba(0,0,0,.18);
+  display:flex;flex-direction:column;gap:10px;padding:14px;
 }
-.chat:empty{background:transparent;border:none;box-shadow:none;}
+.chat:empty{background:transparent;border:none;box-shadow:none}
+.chat::-webkit-scrollbar{width:6px}
+.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px}
 
 /* bubbles */
-.msg{
-  max-width:80%;padding:10px 12px;border-radius:var(--radius);
-  white-space:pre-wrap;word-break:break-word;
-  animation:bubble .25s ease-out;
-}
-.user{align-self:flex-end;background:var(--user);}
-.bot {align-self:flex-start;background:var(--bot);}
-@keyframes bubble{from{opacity:0;transform:translateY(10px)}
-                  to  {opacity:1;transform:none}}
+.msg{max-width:80%;padding:10px 12px;border-radius:var(--radius);white-space:pre-wrap;word-break:break-word;animation:bubble .25s ease-out}
+.user{align-self:flex-end;background:var(--user)}
+.bot{align-self:flex-start;background:var(--bot)}
+@keyframes bubble{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* скролл */
-.chat::-webkit-scrollbar{width:6px;}
-.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px;}
-
-/* GPT-2 badge мигает */
-#aiIndicator{animation:pulse .9s infinite alternate;}
+/* GPT-2 badge */
+#aiIndicator{animation:pulse .9s infinite alternate}
 @keyframes pulse{from{opacity:.6}to{opacity:1}}
