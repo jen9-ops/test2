@@ -1,130 +1,133 @@
-/* ============ GLOBAL HEIGHT ============ */
-html,
-body { height: 100%; }
+/* =========================================================
+   Hyper-Bot  •  Clean CSS (без blur)
+   — читаемое меню в любой теме
+   — мобильная адаптивность
+   ========================================================= */
 
-/* ============ TOKENS ============ */
+/* ---------- full-height цепочка ---------- */
+html, body{height:100%}
+
+/* ---------- базовые токены ---------- */
 :root{
-  --user    : rgba( 76,175, 80,.35);
-  --bot     : rgba(255,255,255,.20);
-  --r       : 12px;
+  --radius : 12px;
 
-  --soft-bg : rgba(255,255,255,.08);
-  --soft-br : rgba(255,255,255,.25);
+  /* chat bubbles */
+  --user-bubble : rgba( 76,175, 80,.35);
+  --bot-bubble  : rgba(255,255,255,.20);
+
+  /* soft-inputs, меню-кнопка */
+  --soft-bg  : rgba(255,255,255,.08);
+  --soft-brd : rgba(255,255,255,.25);
 }
 
-/* ============ BACKGROUND  ============ */
+/* ---------- фон страницы ---------- */
 body{
-  background: radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
-  color: #f7f7f7;                     /* ▸ базовый светлый текст */
+  background:radial-gradient(circle at 20% 20%,#4e54c8 0%,#192f6a 100%);
+  color:#111;               /* базовый тёмный текст для light */
 }
 body.dark{
-  background: radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
-  color: #ffffff;                     /* ▸ базовый БЕЛЫЙ текст */
-  --soft-bg: rgba(255,255,255,.05);
-  --soft-br: rgba(255,255,255,.35);
+  background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%);
+  color:#fff;               /* базовый белый текст для dark  */
+
+  --soft-bg : rgba(255,255,255,.05);
+  --soft-brd: rgba(255,255,255,.35);
 }
 
-/* ============ GENERIC PANELS (без blur) ============ */
+/* ---------- “панели” (navbar, chat, dropdown) ---------- */
 .glass{
-  background: rgba(255,255,255,.06);
-  border    : 1px solid rgba(255,255,255,.15);
-  border-radius: var(--r);
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--radius);
 }
 
-/* ============ NAVBAR LINKS / BRAND  (всегда inherit) ============ */
+/* ---------- navbar ссылкам наследовать цвет темы ---------- */
 .navbar .navbar-brand,
-.navbar .nav-link{ color: inherit; }        /* white в dark, тёмный в light */
-.navbar .nav-link:hover{ color: #0d6efd; }  /* лёгкий синий при ховере в обеих темах */
+.navbar .nav-link{color:inherit}
+.navbar .nav-link:hover{color:#0d6efd}
 
-/* ============ MENU BUTTON  ============ */
+/* ---------- hamburger-кнопка ---------- */
 .menu-btn{
-  width: 42px; height: 42px; padding: 0;
-  display: grid; place-items: center;
-  background: var(--soft-bg);
-  border: 1px solid var(--soft-br);
-  border-radius: 50%;
-  color: #fff;
+  width:42px;height:42px;padding:0;
+  display:grid;place-items:center;
+  background:var(--soft-bg);
+  border:1px solid var(--soft-brd);
+  border-radius:50%;
+  color:#fff;
 }
-.menu-btn:hover{ background: rgba(255,255,255,.12); }
+.menu-btn:hover{background:rgba(255,255,255,.12)}
 
-/* ============  DROPDOWN  ============ */
+/* ---------- DROPDOWN  (контраст в обеих темах) ---------- */
 .dropdown-menu.glass{
-  min-width: 220px;
-  font-size: .9rem;
-  background: rgba(255,255,255,.06);      /* тот же фон, что и чат */
-  color: inherit;                         /* inherit = белый в dark, чёрный в light */
-  border: 1px solid rgba(255,255,255,.25);
+  min-width:220px;font-size:.9rem;margin-top:.5rem; /* ↓ 8 px отступ от шапки */
+  border:1px solid rgba(255,255,255,.25);
 }
+body.dark .dropdown-menu.glass{
+  background:rgba(30,30,30,.88);
+  color:#fff;
+}
+body:not(.dark) .dropdown-menu.glass{
+  background:rgba(255,255,255,.96);
+  color:#111;
+}
+/* пункты меню */
 .dropdown-item{
-  padding: .35rem .85rem;
-  color: inherit;                         /* <— фикс: белый текст в dark */
+  padding:.35rem .85rem;
+  color:inherit !important;         /* белый в dark, чёрный в light */
+  font-weight:500;
 }
 .dropdown-item:hover{
-  background: rgba(255,255,255,.15);
+  background:rgba(255,255,255,.15);
 }
 body:not(.dark) .dropdown-item:hover{
-  background: rgba(0,0,0,.08);
+  background:rgba(0,0,0,.08);
 }
 
-/* ============ SOFT INPUT / TEXTAREA  ============ */
+/* ---------- “soft” inputs / textarea ---------- */
 .form-control.soft,
 textarea.soft{
-  background: var(--soft-bg);
-  border: 1px solid var(--soft-br);
-  border-radius: var(--r);
-  color: inherit;
-  resize: vertical;
+  background:var(--soft-bg);
+  border:1px solid var(--soft-brd);
+  border-radius:var(--radius);
+  color:inherit;                     /* белый / чёрный как у body  */
+  resize:vertical;
 }
+textarea.soft{min-height:44px}
 .form-control.soft::placeholder,
 textarea.soft::placeholder{
-  color: rgba(255,255,255,.85);           /* яркий placeholder */
+  color:rgba(255,255,255,.85);       /* яркий placeholder */
 }
 body:not(.dark) .form-control.soft::placeholder{
-  color: #555;
+  color:#555;
 }
 
-/* ============ CHAT ============ */
+/* ---------- chat-контейнер ---------- */
 .chat{
-  display: flex; flex-direction: column; gap: 10px;
-  padding: 14px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: var(--r);
-  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--radius);
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
 }
-.chat:empty{ background: transparent; border: none; box-shadow: none; }
-.chat::-webkit-scrollbar       { width: 6px; }
-.chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,.3); border-radius: 3px; }
+.chat:empty{background:transparent;border:none;box-shadow:none}
+.chat::-webkit-scrollbar{width:6px}
+.chat::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.30);border-radius:3px}
 
-/* ============ MESSAGE BUBBLES ============ */
+/* ---------- message bubbles ---------- */
 .msg{
-  max-width: 80%;
-  padding: 10px 12px;
-  border-radius: var(--r);
-  white-space: pre-wrap;
-  word-break: break-word;
-  animation: bubble .25s ease-out;
+  max-width:80%;padding:10px 12px;
+  border-radius:var(--radius);
+  white-space:pre-wrap;word-break:break-word;
+  animation:bubble .25s ease-out;
 }
-.user{ align-self: flex-end; background: var(--user); }
-.bot { align-self: flex-start; background: var(--bot); }
-
-/* 1 ── читаемый текст внутри раскрытого меню  */
-/*    светлая + тёмная тема сразу             */
-.dropdown-menu.glass .dropdown-item{
-  color: inherit !important;           /* наследует белый / чёрный из body */
-  font-weight: 500;                    /* чуть толще для контраста         */
-}
-
-/* 2 ── меню не прилипает к навбару, а отступает ↓ 8 px */
-.navbar .dropdown-menu{
-  margin-top: .5rem;                   /* 0.5 rem ~ 8 px                   */
-}
-
+.user{align-self:flex-end;background:var(--user-bubble)}
+.bot {align-self:flex-start;background:var(--bot-bubble)}
 @keyframes bubble{
-  from{ opacity: 0; transform: translateY(10px); }
-  to  { opacity: 1; transform: none; }
+  from{opacity:0;transform:translateY(10px)}
+  to  {opacity:1;transform:none}
 }
 
-/* ============ GPT-2 BADGE  ============ */
-#aiIndicator{ animation: pulse .9s infinite alternate; }
-@keyframes pulse{ from{opacity:.6;} to{opacity:1;} }
+/* ---------- GPT-2 badge ---------- */
+#aiIndicator{animation:pulse .9s infinite alternate}
+@keyframes pulse{from{opacity:.6;} to{opacity:1;}}
