@@ -4,27 +4,29 @@
   <meta charset="UTF-8" />
   <title>Hyper-Bot 🎓</title>
 
+  <!-- mobile-meta -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0,
-                 maximum-scale=1.0, user-scalable=no">
+                 maximum-scale=1.0, user-scalable=no" />
   <link rel="icon" href="icon.ico" />
 
-  <!-- Bootstrap + Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
+  <!-- Bootstrap 5 + Bootstrap-Icons + custom -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- GPT-2 small in browser -->
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js"></script>
 </head>
 
 <body>
-  <!-- ══ NAVBAR ══ -->
+  <!-- ══ NAVBAR ═════════════════════════════════ -->
   <header class="navbar navbar-expand-lg glass shadow-sm">
     <div class="container-fluid">
-      <!-- ▶ бейдж перенесён внутрь .navbar-brand ◀ -->
       <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
-        <i class="bi bi-robot"></i>
-        <span>Hyper-Bot</span>
+        <i class="bi bi-robot"></i><span>Hyper-Bot</span>
         <span id="progress" class="badge bg-warning text-dark ms-1">0 %</span>
       </a>
 
@@ -34,11 +36,23 @@
 
       <nav id="navBot" class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav gap-lg-2">
-          <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#mdlText">
-            <i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
+          <li class="nav-item">
+            <a class="nav-link"
+               href="#"
+               data-bs-toggle="modal"
+               data-bs-target="#mdlText">
+              <i class="bi bi-file-text me-1"></i>Обучить текстом
+            </a>
+          </li>
 
-          <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#mdlURL">
-            <i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
+          <li class="nav-item">
+            <a class="nav-link"
+               href="#"
+               data-bs-toggle="modal"
+               data-bs-target="#mdlURL">
+              <i class="bi bi-link-45deg me-1"></i>Обучить URL
+            </a>
+          </li>
 
           <li class="nav-item"><a class="nav-link" href="#" onclick="showAnalysis()">
             <i class="bi bi-bar-chart me-1"></i>Анализ</a></li>
@@ -46,7 +60,8 @@
           <li class="nav-item"><a class="nav-link" href="#" onclick="exportData()">
             <i class="bi bi-download me-1"></i>Скачать память</a></li>
 
-          <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('fileInput').click()">
+          <li class="nav-item"><a class="nav-link" href="#"
+            onclick="document.getElementById('fileInput').click()">
             <i class="bi bi-upload me-1"></i>Загрузить память</a></li>
 
           <li class="nav-item"><a class="nav-link" href="#" onclick="clearChat()">
@@ -62,7 +77,7 @@
     </div>
   </header>
 
-  <!-- ══ MAIN ══ -->
+  <!-- ══ MAIN ══════════════════════════════════ -->
   <main class="flex-grow-1 d-flex flex-column gap-2 p-3 overflow-hidden">
     <div id="chat" class="chat glass"></div>
 
@@ -73,11 +88,41 @@
     </div>
   </main>
 
+  <!-- hidden file-input -->
   <input id="fileInput" type="file" accept="application/json" class="d-none"
          onchange="importData(event)">
 
-  <!-- modals (остались прежними) -->
+  <!-- ══ MODALS (Text & URL) ═══════════════════ -->
+  <div id="mdlText" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content glass p-3">
+        <h5 class="modal-title mb-3"><i class="bi bi-pencil-square me-2"></i>Обучить по тексту</h5>
+        <textarea id="textInput" class="form-control mb-3" rows="6"
+                  placeholder="Вставь текст для обучения…"></textarea>
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal"
+                  onclick="trainFromText()">Обучить</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <div id="mdlURL" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content glass p-3">
+        <h5 class="modal-title mb-3"><i class="bi bi-link-45deg me-2"></i>Обучить по URL</h5>
+        <input id="urlInput" class="form-control mb-3" placeholder="https://пример.ru">
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal"
+                  onclick="trainFromURL()">Загрузить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
 </body>
