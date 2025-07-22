@@ -1,12 +1,11 @@
 /* =========================================================
-   Hyper-Bot • app.js  (2025-07-22 rev-D)
+   Hyper-Bot • app.js • локальная версия
    ---------------------------------------------------------
-   • DistilGPT-2 (≈45 MB, быстрее)
-   • Автоматическая подгрузка transformers.min.js,
-     если window.transformers === undefined
-   • Прогресс скачивания весов 0-100 %
+   • Использует локальный  transformers.min.js
+     (лежит рядом с index.html)
+   • DistilGPT-2  (≈45 MB, быстрее чем gpt2-small)
    • Таймаут инференса 30 s
-   • Bulk-learning «вопрос - ответ» (по строкам)
+   • Массовое обучение “вопрос - ответ”
    ========================================================= */
 
 /* ---------- DOM helpers ---------- */
@@ -15,18 +14,16 @@ function toggleTheme(){ document.body.classList.toggle('dark'); }
 const chat    = document.getElementById('chat');
 const aiBadge = document.getElementById('aiIndicator');
 
-const append = (from, txt, cls) => {
-  const d = document.createElement('div');
-  d.className = `msg ${cls}`;
-  d.textContent = `${from}: ${txt}`;
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
+const append = (who,txt,cls)=>{
+  const d=document.createElement('div');
+  d.className=`msg ${cls}`; d.textContent=`${who}: ${txt}`;
+  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
   return d;
 };
-const clearChat = () => { chat.innerHTML = ''; };
+const clearChat=()=>{chat.innerHTML='';};
 
-/* ---------- шаблоны PowerShell ---------- */
-const templates = [
+/* ---------- PowerShell templates ---------- */
+const templates=[
   {p:/создать vhdx (?<size>\d+(?:gb|mb)) в (?<path>.+)/i,
    f:({size,path})=>`# VHDX\n$vhd="${path}\\VirtualDisk.vhdx"\nNew-VHD -Path $vhd -SizeBytes ${size.toUpperCase()} -Dynamic\nMount-VHD -Path $vhd`},
   {p:/зашифровать диск (?<letter>[a-z]): с ключом в (?<keyPath>.+)/i,
@@ -34,7 +31,7 @@ const templates = [
   {p:/показать процессы/i,            f:()=>'Get-Process | Sort-Object CPU -desc | Select -First 25'},
   {p:/убить процесс (?<name>\S+)/i,   f:({name})=>`Stop-Process -Name "${name}" -Force`}
 ];
-const tmpl=q=>{for(const t of templates){const m=q.match(t.p);if(m)return t.f(m?.groups||{});}return null;};
+const tmpl=q=>{for(const t of templates){const m=q.match(t.p);if(m)return t.f(m.groups||{});}return null;};
 
 /* ---------- localStorage memory ---------- */
 let knowledge=JSON.parse(localStorage.getItem('knowledgeBase')||'[]');
@@ -43,7 +40,7 @@ const save   =()=>{localStorage.setItem('knowledgeBase',JSON.stringify(knowledge
                    localStorage.setItem('corpus',       JSON.stringify(corpus));};
 
 /* ---------- progress badge ---------- */
-const TARGET=100_000;                   // 100 % = 100 k предложений
+const TARGET=100_000;
 const bar=document.getElementById('progress');
 const updateBar=()=>{bar.textContent=Math.min(100,Math.round(corpus.length/TARGET*100))+' %';};
 updateBar();
@@ -51,20 +48,17 @@ updateBar();
 /* ---------- DistilGPT-2 ---------- */
 let gpt=null, activeWait=null;
 
-async function ensureTransformers(){
-  if(window.transformers) return;
-  await new Promise(res=>{
-    const s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js';
-    s.onload=res; document.head.appendChild(s);
-  });
-}
-
 async function loadModel(){
   if(gpt) return;
-  await ensureTransformers();
+
+  if(!window.transformers){
+    append('ИИ','transformers.min.js не подключён!','bot');
+    throw new Error('Transformers not found');
+  }
+
   const {pipeline,env}=window.transformers;
 
+  /* прогресс скачивания весов */
   env.onprogress = p=>{
     if(activeWait) activeWait.textContent = `ИИ: качаю ${(p*100|0)} %`;
   };
@@ -74,29 +68,27 @@ async function loadModel(){
 
 async function genPS(prompt){
   await loadModel();
-  const o = await gpt(prompt+'\n```powershell\n',{max_new_tokens:60,temperature:.3,stop:['```']});
-  return o[0].generated_text.split('```powershell')[1]?.replace('```','')?.trim();
+  const out=await gpt(prompt+'\n```powershell\n',{max_new_tokens:60,temperature:.3,stop:['```']});
+  return out[0].generated_text.split('```powershell')[1]?.replace('```','')?.trim();
 }
 
-/* ---------- training ---------- */
-const stopW=new Set('и в во не что он на я ...'.split(' '));
-
+/* ---------- bulk training ---------- */
 function trainFromText(){
   const raw=document.getElementById('textInput').value.trim();
   if(!raw) return alert('Текст?');
 
   let pairs=0,single=0;
-  raw.split(/\r?\n+/).forEach(l=>{
-    const parts=l.split(' - ');
+  raw.split(/\r?\n+/).forEach(line=>{
+    const parts=line.split(' - ');
     if(parts.length===2){
       const[q,a]=parts.map(s=>s.trim());
       if(q&&a){knowledge.push({request:q.toLowerCase(),answer:a});pairs++;}
     }else{
-      const s=l.trim();
-      if(s){corpus.push(s);single++;}
+      const s=line.trim(); if(s){corpus.push(s);single++;}
     }
   });
-  save();updateBar();
+
+  save(); updateBar();
   append('ИИ',`Загружено: пар ${pairs}, предложений ${single}`,'bot');
   document.getElementById('textInput').value='';
 }
@@ -106,17 +98,18 @@ async function trainFromURL(){
   if(!url) return alert('URL?');
   try{
     const data=await (await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url))).json();
-    const txt=[...new DOMParser().parseFromString(data.contents,'text/html').querySelectorAll('p')].map(p=>p.textContent.trim()).join(' ');
-    txt.split(/[.!?\r?\n]+/).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    const text=[...new DOMParser().parseFromString(data.contents,'text/html').querySelectorAll('p')].map(p=>p.textContent.trim()).join(' ');
+    text.split(/[.!?\r?\n]+/).map(s=>s.trim()).filter(Boolean).forEach(s=>{
       knowledge.push({request:s.toLowerCase(),answer:s}); corpus.push(s);
     });
-    save();updateBar();
+    save(); updateBar();
     append('ИИ',`С URL обучено: ${corpus.length}`,'bot');
     document.getElementById('urlInput').value='';
   }catch{alert('Не удалось загрузить URL');}
 }
 
 /* ---------- analysis ---------- */
+const stopW=new Set('и в во не что он на я ...'.split(' '));
 function analysis(){
   if(!corpus.length) return 'Корпус пуст!';
   let total=0,f={};
@@ -141,7 +134,7 @@ function importData(e){
     try{
       const d=JSON.parse(ev.target.result);
       if(Array.isArray(d.knowledge)&&Array.isArray(d.corpus)){
-        knowledge=d.knowledge; corpus=d.corpus; save();updateBar();
+        knowledge=d.knowledge; corpus=d.corpus; save(); updateBar();
         append('ИИ','Память восстановлена!','bot');
       }
     }catch{alert('Некорректный файл');}
@@ -157,11 +150,11 @@ function clearMemory(){
 /* ---------- chat engine ---------- */
 function sim(a,b){
   const w1=a.split(/\s+/), w2=b.split(/\s+/);
-  return w1.filter(x=>w2.includes(x)).length/Math.max(w1.length,w2.length);
+  return w1.filter(x=>w2.includes(x)).length / Math.max(w1.length,w2.length);
 }
 function kbMatch(q){
   let best=null,s=0;
-  knowledge.forEach(e=>{const sc=sim(q,e.request);if(sc>s){s=sc;best=e;}});
+  knowledge.forEach(e=>{const sc=sim(q,e.request); if(sc>s){s=sc;best=e;}});
   return s>0.35?best.answer:null;
 }
 
@@ -174,19 +167,18 @@ async function ask(){
 
   if(q.includes(' - ')){
     const [req,ans]=q.split(' - ').map(s=>s.trim());
-    if(req&&ans){knowledge.push({request:req.toLowerCase(),answer:ans});save();updateBar();append('ИИ','Запомнил!','bot');}
+    if(req&&ans){knowledge.push({request:req.toLowerCase(),answer:ans}); save(); updateBar(); append('ИИ','Запомнил!','bot');}
     return;
   }
 
-  let ans=tmpl(q.toLowerCase())||kbMatch(q.toLowerCase());
+  let ans=tmpl(q.toLowerCase()) || kbMatch(q.toLowerCase());
   if(!ans){
-    activeWait = append('ИИ','ИИ: качаю 0 %','bot');
+    activeWait=append('ИИ','ИИ: качаю 0 %','bot');
     aiBadge.classList.remove('d-none');
 
-    /* timeout 30 s */
     const timeout=new Promise((_,rej)=>setTimeout(()=>rej('timeout'),30_000));
     try{ ans = await Promise.race([genPS(`Напиши PowerShell-скрипт: ${q}`), timeout]); }
-    catch(e){ ans = `⚠️ GPT-2 не ответил: ${e}`; }
+    catch(e){ ans = ` GPT-2 не ответил: ${e}`; }
 
     aiBadge.classList.add('d-none');
     activeWait.textContent='ИИ: '+ans; activeWait=null;
