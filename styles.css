@@ -1,107 +1,121 @@
-/* ===================  GLOBAL & TOKENS  =================== */
-html, body { height: 100%; }          /* цепочка full-height */
+/* ============ GLOBAL HEIGHT ============ */
+html,
+body { height: 100%; }
 
-:root{
-  --user:      rgba( 76,175, 80,.35);   /* пузырь пользователя  */
-  --bot:       rgba(255,255,255,.20);   /* пузырь ИИ            */
-  --r:         12px;                    /* общий radius         */
-  --blur:      14px;                    /* стандартный blur     */
+/* ============ TOKENS ============ */
+:root {
+  --user:     rgba( 76,175, 80,.35);
+  --bot:      rgba(255,255,255,.20);
+  --r:        12px;          /* border-radius */
+  --blur:     14px;          /* generic blur  */
 
-  --soft-bg:   rgba(255,255,255,.08);   /* фон soft-input (light) */
-  --soft-br:   rgba(255,255,255,.25);   /* рамка soft-input       */
+  /* “soft” inputs */
+  --soft-bg:  rgba(255,255,255,.08);
+  --soft-br:  rgba(255,255,255,.25);
 }
 
-/* ===== базовый фон: светлая ◄► тёмная ===== */
-body{
-  background:radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
-  color:#f7f7f7;
+/* ============ BACKGROUND (LIGHT / DARK) ============ */
+body {
+  background: radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
+  color: #f7f7f7;
 }
-body.dark{
-  background:radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
-  color:#ffffff;
+
+body.dark {
+  background: radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
+  color: #ffffff;
+
   --soft-bg: rgba(255,255,255,.05);
   --soft-br: rgba(255,255,255,.35);
 }
 
-/* ===================  GLASS PRESET  =================== */
-.glass{
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(var(--blur));
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--r);
+/* ============ GLASS PRESET ============ */
+.glass {
+  background: rgba(255,255,255,.05);
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--r);
 }
 
-/* ===================  NAVBAR BUTTON  =================== */
-.menu-btn{
-  width:42px;height:42px;padding:0;
-  display:grid;place-items:center;
-  background:var(--soft-bg);
-  border:1px solid var(--soft-br);
-  border-radius:50%;
-  color:#fff;
+/* ============ MENU BUTTON (BURGER) ============ */
+.menu-btn {
+  width: 42px; height: 42px; padding: 0;
+  display: grid; place-items: center;
+  background: var(--soft-bg);
+  border: 1px solid var(--soft-br);
+  border-radius: 50%;
+  color: #fff;
 }
-.menu-btn:hover{background:rgba(255,255,255,.12);}
+.menu-btn:hover { background: rgba(255,255,255,.12); }
 
-/* ===================  DROPDOWN  (muted / blurry)  ====== */
-.dropdown-menu.glass{
-  min-width:220px;
-  font-size:.9rem;
-  background:rgba(30,30,30,.35);          /* лёгкая дымка */
-  color:#fff;
-  border:1px solid rgba(255,255,255,.20);
-  backdrop-filter:blur(24px) saturate(160%); /* сильный мутный эффект */
+/* ============ DROPDOWN (BLUR 8 px, OPAQUE) ============ */
+.dropdown-menu.glass {
+  min-width: 220px;
+  font-size: .9rem;
+  background: rgba(30,30,30,.65);          /* dark, 65 % */
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(8px) saturate(140%);
 }
-body:not(.dark) .dropdown-menu.glass{
-  background:rgba(255,255,255,.45);
-  color:#111;
+body:not(.dark) .dropdown-menu.glass {
+  background: rgba(255,255,255,.70);       /* light, 70 % */
+  color: #111;
 }
-.dropdown-item{padding:.35rem .85rem}
-.dropdown-item:hover{background:rgba(255,255,255,.15)}
-body:not(.dark) .dropdown-item:hover{background:rgba(0,0,0,.06)}
+.dropdown-item           { padding: .35rem .85rem; }
+.dropdown-item:hover     { background: rgba(255,255,255,.15); }
+body:not(.dark) .dropdown-item:hover { background: rgba(0,0,0,.06); }
 
-/* ===================  SOFT INPUTS / TEXTAREA  ========== */
+/* ============ SOFT INPUTS & TEXTAREA ============ */
 .form-control.soft,
-textarea.soft{
-  background:var(--soft-bg);
-  border:1px solid var(--soft-br);
-  border-radius:var(--r);
-  color:inherit;
-  resize:vertical;
+textarea.soft {
+  background: var(--soft-bg);
+  border: 1px solid var(--soft-br);
+  border-radius: var(--r);
+  color: inherit;
+  resize: vertical;
 }
 .form-control.soft::placeholder,
-textarea.soft::placeholder{color:rgba(255,255,255,.55);}
-body:not(.dark) .form-control.soft::placeholder{color:#6c757d;}
-
-/* ===================  CHAT CONTAINER  ================== */
-.chat{
-  display:flex;flex-direction:column;gap:10px;
-  padding:14px;
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(var(--blur));
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--r);
-  box-shadow:0 8px 32px rgba(0,0,0,.18);
+textarea.soft::placeholder {
+  color: rgba(255,255,255,.72);             /* заметнее */
 }
-.chat:empty{background:transparent;border:none;box-shadow:none;}
-.chat::-webkit-scrollbar{width:6px;}
-.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px;}
-
-/* ===================  BUBBLES  ========================= */
-.msg{
-  max-width:80%;
-  padding:10px 12px;
-  border-radius:var(--r);
-  white-space:pre-wrap;
-  word-break:break-word;
-  animation:bubble .25s ease-out;
-}
-.user{align-self:flex-end;background:var(--user);}
-.bot {align-self:flex-start;background:var(--bot);}
-@keyframes bubble{
-  from{opacity:0;transform:translateY(10px);}
-  to  {opacity:1;transform:none;}
+body:not(.dark) .form-control.soft::placeholder {
+  color: #495057;
 }
 
-/* ===================  GPT-2 BADGE  ===================== */
-#aiIndicator{animation:pulse .9s infinite alternate;}
-@keyframes pulse{from{opacity:.6;} to{opacity:1;}}
+/* ============ CHAT CONTAINER ============ */
+.chat {
+  display: flex; flex-direction: column;
+  gap: 10px; padding: 14px;
+  background: rgba(255,255,255,.05);
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--r);
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+}
+.chat:empty {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.chat::-webkit-scrollbar       { width: 6px; }
+.chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,.3); border-radius: 3px; }
+
+/* ============ MESSAGE BUBBLES ============ */
+.msg {
+  max-width: 80%;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  white-space: pre-wrap;
+  word-break: break-word;
+  animation: bubble .25s ease-out;
+}
+.user { align-self: flex-end; background: var(--user); }
+.bot  { align-self: flex-start; background: var(--bot); }
+
+@keyframes bubble {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ============ GPT-2 BADGE ============ */
+#aiIndicator { animation: pulse .9s infinite alternate; }
+@keyframes pulse { from { opacity:.6; } to { opacity:1; } }
