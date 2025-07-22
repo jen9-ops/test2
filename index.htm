@@ -7,13 +7,23 @@
 
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- 1. Локальная библиотека Transformers -->
+  <!-- Локальный Transformers (может не успеть загрузиться — в app.js есть проверка/дозагрузка) -->
   <script src="transformers.min.js"></script>
-  <!-- 2. Основной код -->
+
+  <!-- jsDelivr client (ESM) -->
+  <script type="module">
+    import { createJsDelivrClient } from './client.js';
+    window.jsd = createJsDelivrClient({
+      userAgent: 'HyperBot/0.1 (+https://jen9-ops.github.io/test2/)'
+    });
+    console.log('[jsd] client ready');
+  </script>
+
+  <!-- Основной код -->
   <script src="app.js" defer></script>
 </head>
 <body>
-  <!-- ░ NAVBAR ░ -->
+  <!-- NAVBAR -->
   <nav class="navbar">
     <span class="brand">🤖 Hyper-Bot</span>
     <span id="progress" class="badge">0 %</span>
@@ -28,7 +38,7 @@
       <button data-act="export">⬇ Скачать память</button>
       <button data-act="import">⬆ Загрузить память</button>
       <button data-act="clearChat">✖ Очистить чат</button>
-      <button data-act="clearMemory" class="danger">🗑 Очистить память</button>
+      <button data-act="clearMemory" class="danger"><spawn style=color:pink;</spawn>🗑 Очистить память</button>
       <hr>
       <button data-act="theme">🌙 Тёмная тема</button>
     </div>
@@ -36,7 +46,7 @@
 
   <input id="fileInp" type="file" accept="application/json" class="hidden" />
 
-  <!-- ░ TRAIN PANELS ░ -->
+  <!-- TRAIN PANELS -->
   <section id="trainText" class="panel hidden">
     <textarea id="textInput" class="soft" placeholder="каждая строка: вопрос - ответ"></textarea>
     <div class="actions">
@@ -53,10 +63,10 @@
     </div>
   </section>
 
-  <!-- ░ CHAT ░ -->
+  <!-- CHAT -->
   <main id="chat" class="chat"></main>
 
-  <!-- ░ INPUT BAR ░ -->
+  <!-- INPUT BAR -->
   <footer class="inputbar">
     <textarea id="userInput" class="soft" placeholder="Shift+Enter — новая строка, Ctrl+Enter — отправить"></textarea>
     <button id="sendBtn" aria-label="Отправить">➤</button>
@@ -65,7 +75,7 @@
   <!-- GPT badge -->
   <span id="aiIndicator" class="badge d-none">GPT-2</span>
 
-  <!-- ░ Interactive Console ░ -->
+  <!-- Interactive Console -->
   <div id="dbgToggle">⇧ Console ⇧</div>
 
   <div id="dbgPanel" class="collapsed">
