@@ -1,45 +1,68 @@
-/* ==== фон страницы ==== */
+/* -------------- Theme tokens -------------- */
+:root{
+  --user: rgba( 76,175, 80,.35);   /* зелёный 35 % */
+  --bot : rgba(255,255,255,.20);   /* белый 20 %  */
+  --radius:        12px;
+  --blur-strength: 14px;
+}
+
+/* -------------- Background -------------- */
 body{
   min-height:100vh;
-  /* фиолетово-синий radial-градиент */
   background:radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
-  /* поддержка auto-тёмной темы */
   color:#f7f7f7;
 }
 body.dark{
   background:radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
+  color:#e0e0e0;
 }
 
-/* ==== стекло-карточка ==== */
+/* -------------- Glass morphism -------------- */
 .glass{
   background:rgba(255,255,255,.06);
-  backdrop-filter:blur(14px);
+  backdrop-filter:blur(var(--blur-strength));
   border:1px solid rgba(255,255,255,.15);
-  border-radius:12px;
+  border-radius:var(--radius);
 }
-.navbar.glass{border-radius:0 0 20px 20px;}
+.navbar.glass{
+  border-radius:0 0 20px 20px;   /* полукруглый низ шапки */
+}
 
-/* ==== чат + пузыри ==== */
+/* -------------- Chat container -------------- */
 .chat{
-  flex:1 1 auto; display:flex; flex-direction:column; gap:10px;
-  padding:14px; overflow-y:auto;
-  border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,.2);
+  flex:1 1 auto;
+  display:flex; flex-direction:column; gap:10px;
+  padding:14px;
+  overflow-y:auto;
+  border-radius:var(--radius);
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(var(--blur-strength));
+  border:1px solid rgba(255,255,255,.15);
 }
+
+/* -------------- Bubbles -------------- */
 .msg{
-  max-width:80%; padding:10px 12px; border-radius:12px;
-  white-space:pre-wrap; word-wrap:break-word;
+  max-width:80%;
+  padding:10px 12px;
+  border-radius:var(--radius);
+  white-space:pre-wrap;
+  word-break:break-word;
   animation:bubble .25s ease-out;
 }
-.user{align-self:flex-end;background:rgba(76,175,80,.35);}
-.bot {align-self:flex-start;background:rgba(255,255,255,.18);}
+.user{align-self:flex-end;background:var(--user);}
+.bot {align-self:flex-start;background:var(--bot);}
+
+/* -------------- Bubble animation -------------- */
 @keyframes bubble{
   from{opacity:0;transform:translateY(10px);}
   to  {opacity:1;transform:none;}
 }
 
-/* ==== кастом scroll-bar (Chrome) ==== */
+/* -------------- Custom scrollbar (Chrome/WebKit) -------------- */
 .chat::-webkit-scrollbar{width:6px;}
 .chat::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.3); border-radius:3px;
+  background:rgba(255,255,255,.3);
+  border-radius:3px;
 }
 .chat::-webkit-scrollbar-track{background:transparent;}
