@@ -6,19 +6,14 @@
 
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0,
-                 maximum-scale=1.0, user-scalable=no" />
-  <link rel="icon" href="ico.ico" type="image/x-icon" />
+                 maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" href="icon.ico" />
 
-  <!-- Bootstrap & Bootstrap-Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        rel="stylesheet" crossorigin="anonymous">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-        rel="stylesheet">
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-  <!-- Кастомный стиль -->
   <link rel="stylesheet" href="styles.css">
-
-  <!-- GPT-2 small -->
   <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js"></script>
 </head>
 
@@ -26,22 +21,23 @@
   <!-- ══ NAVBAR ══ -->
   <header class="navbar navbar-expand-lg glass shadow-sm">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="#">
-        <i class="bi bi-robot me-1"></i>Hyper-Bot
+      <!-- ▶ бейдж перенесён внутрь .navbar-brand ◀ -->
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+        <i class="bi bi-robot"></i>
+        <span>Hyper-Bot</span>
+        <span id="progress" class="badge bg-warning text-dark ms-1">0 %</span>
       </a>
-      <span id="progress" class="badge bg-warning text-dark">0 %</span>
 
-      <button class="navbar-toggler" type="button"
-              data-bs-toggle="collapse" data-bs-target="#navBot">
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navBot">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse justify-content-end" id="navBot">
+      <nav id="navBot" class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav gap-lg-2">
-          <li class="nav-item"><a class="nav-link" href="#" onclick="showTrainText()">
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#mdlText">
             <i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
 
-          <li class="nav-item"><a class="nav-link" href="#" onclick="showTrainURL()">
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#mdlURL">
             <i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
 
           <li class="nav-item"><a class="nav-link" href="#" onclick="showAnalysis()">
@@ -50,8 +46,7 @@
           <li class="nav-item"><a class="nav-link" href="#" onclick="exportData()">
             <i class="bi bi-download me-1"></i>Скачать память</a></li>
 
-          <li class="nav-item"><a class="nav-link" href="#"
-            onclick="document.getElementById('fileInput').click()">
+          <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('fileInput').click()">
             <i class="bi bi-upload me-1"></i>Загрузить память</a></li>
 
           <li class="nav-item"><a class="nav-link" href="#" onclick="clearChat()">
@@ -63,46 +58,27 @@
           <li class="nav-item"><a class="nav-link" href="#" onclick="toggleTheme()">
             <i class="bi bi-moon-stars me-1"></i>Тёмная тема</a></li>
         </ul>
-      </div>
+      </nav>
     </div>
   </header>
 
   <!-- ══ MAIN ══ -->
-  <main class="flex-grow-1 d-flex flex-column gap-3 p-3 overflow-hidden">
-    <!-- обучение текстом -->
-    <section id="trainText" class="d-none">
-      <textarea id="textInput" class="form-control mb-2"
-                placeholder="Вставь текст для обучения…"></textarea>
-      <button class="btn btn-primary"
-              onclick="trainFromText(); hideSections();">Обучить</button>
-    </section>
-
-    <!-- обучение URL -->
-    <section id="trainURL" class="d-none d-flex flex-wrap gap-2 align-items-start">
-      <input id="urlInput" class="form-control flex-grow-1"
-             placeholder="Вставь URL для обучения">
-      <button class="btn btn-primary"
-              onclick="trainFromURL(); hideSections();">Загрузить URL</button>
-    </section>
-
-    <!-- чат -->
+  <main class="flex-grow-1 d-flex flex-column gap-2 p-3 overflow-hidden">
     <div id="chat" class="chat glass"></div>
 
-    <!-- строка ввода -->
     <div class="d-flex gap-2">
-      <input id="userInput" class="form-control"
-             placeholder="Напиши сообщение…"
+      <input id="userInput" class="form-control" placeholder="Напиши сообщение…"
              onkeydown="if(event.key==='Enter'){ask();}">
       <button class="btn btn-primary" onclick="ask()">➤</button>
     </div>
   </main>
 
-  <!-- скрытый input -->
-  <input id="fileInput" type="file" accept="application/json"
-         class="d-none" onchange="importData(event)">
+  <input id="fileInput" type="file" accept="application/json" class="d-none"
+         onchange="importData(event)">
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-          crossorigin="anonymous"></script>
+  <!-- modals (остались прежними) -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
