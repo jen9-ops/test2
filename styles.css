@@ -1,77 +1,32 @@
-/* === tokens === */
-:root{
-  --user: rgba( 76,175, 80,.35);
-  --bot : rgba(255,255,255,.20);
-  --radius: 12px;
-  --blur:   14px;
-  --soft-bg: rgba(255,255,255,.08);   /* фон для input/textarea */
-  --soft-br: rgba(255,255,255,.25);   /* рамка в светлой */
+/* --- компактная кнопка меню ------------------------------------- */
+.menu-btn{
+  width:40px;height:40px;
+  display:grid;place-items:center;
+  background:var(--soft-bg);
+  border:1px solid var(--soft-br);
+  border-radius:50%;
+  color:#fff;
 }
+body.dark .menu-btn{color:#fff;border-color:rgba(255,255,255,.4);}
 
-body{
-  min-height:100vh;
-  background:radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
-  color:#f7f7f7;
+/* --- dropdown цвета --------------------------------------------- */
+.dropdown-menu{
+  min-width:220px;font-size:.9rem;
 }
-body.dark{
-  background:radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
-  color:#ffffff;
-  --soft-bg: rgba(255,255,255,.05);
-  --soft-br: rgba(255,255,255,.35);
+.dropdown-menu.glass{
+  background:rgba(30,30,30,.85);
+  color:#fff;
 }
+body:not(.dark) .dropdown-menu.glass{background:rgba(255,255,255,.97);color:#111;}
+.dropdown-item:hover{background:rgba(255,255,255,.15);}
+body:not(.dark) .dropdown-item:hover{background:rgba(0,0,0,.05);}
 
-/* === glass === */
-.glass{
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(var(--blur));
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--radius);
-}
-.navbar.glass{border-radius:0 0 20px 20px;}
-
-/* === soft inputs === */
-.form-control.soft, textarea.soft{
+/* --- инпуты / textarea (soft) ----------------------------------- */
+.form-control.soft,textarea.soft{
   background:var(--soft-bg);
   border:1px solid var(--soft-br);
   color:inherit;
-  border-radius:var(--radius);
 }
-.form-control.soft::placeholder, textarea.soft::placeholder{color:#c9d1d9;}
-body.dark .dropdown-menu{color:#fff;}
-
-/* === chat === */
-.chat{
-  flex:1; display:flex; flex-direction:column; gap:10px;
-  padding:14px; overflow-y:auto;
-  border-radius:var(--radius);
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(var(--blur));
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:0 8px 32px rgba(0,0,0,.18);
-}
-.chat:empty{background:transparent;border:none;box-shadow:none;}
-
-/* === bubbles === */
-.msg{
-  max-width:80%; padding:10px 12px; border-radius:var(--radius);
-  white-space:pre-wrap; word-break:break-word;
-  animation:bubble .25s ease-out;
-}
-.user{align-self:flex-end;background:var(--user);}
-.bot {align-self:flex-start;background:var(--bot);}
-@keyframes bubble{from{opacity:0;transform:translateY(10px)}
-                  to{opacity:1;transform:none}}
-
-/* === dropdown menu tweaks === */
-.dropdown-menu.glass{
-  background:rgba(0,0,0,.55);
-  border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(var(--blur));
-}
-.dropdown-item{font-size:.9rem;padding:.35rem .85rem;}
-.dropdown-item i{opacity:.9;}
-.dropdown-item:active{background:rgba(255,255,255,.15);}
-
-/* scrollbar */
-.chat::-webkit-scrollbar{width:6px;}
-.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px;}
+.form-control.soft::placeholder,
+textarea.soft::placeholder{color:rgba(255,255,255,.55);}
+body:not(.dark) .form-control.soft::placeholder{color:#6c757d;}
