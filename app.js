@@ -197,3 +197,24 @@ document.getElementById('userInput')
   .addEventListener('keydown',e=>{
     if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();ask();}
 });
+/* ==== tiny debug console ================================= */
+(() => {
+  const logBox   = document.getElementById('dbgLog');
+  const toggle   = document.getElementById('dbgToggle');
+  const panel    = document.getElementById('dbgPanel');
+  const clearBtn = document.getElementById('dbgClear');
+
+  const clog = (type, args) => {
+    const msg = [...args].map(x => (typeof x==='object'? JSON.stringify(x): x)).join(' ');
+    logBox.textContent += `[${type}] ${msg}\n`;
+    logBox.scrollTop = logBox.scrollHeight;
+  };
+
+  ['log','warn','error'].forEach(fn => {
+    const orig = console[fn];
+    console[fn] = (...args) => { orig.apply(console,args); clog(fn,args); };
+  });
+
+  toggle.onclick = () => panel.classList.toggle('open');
+  clearBtn.onclick = () => logBox.textContent='';
+})();
