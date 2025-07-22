@@ -218,3 +218,4 @@ document.getElementById('userInput')
   toggle.onclick = () => panel.classList.toggle('open');
   clearBtn.onclick = () => logBox.textContent='';
 })();
+console.log('🔧 Debug console ready (Android)');
