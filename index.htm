@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- 1. Локальная библиотека Transformers.js -->
+  <!-- 1. Локальная библиотека Transformers -->
   <script src="transformers.min.js"></script>
   <!-- 2. Основной код -->
   <script src="app.js" defer></script>
@@ -65,11 +65,28 @@
   <!-- GPT badge -->
   <span id="aiIndicator" class="badge d-none">GPT-2</span>
 
-  <!-- ░ INLINE CONSOLE ░ -->
+  <!-- ░ Interactive Console ░ -->
   <div id="dbgToggle">⇧ Console ⇧</div>
-  <div id="dbgPanel">
+
+  <div id="dbgPanel" class="collapsed">
+    <div class="dbg-head">
+      <span>Console</span>
+      <button id="dbgFull">⛶</button>
+      <button id="dbgClose">✕</button>
+    </div>
+
     <pre id="dbgLog"></pre>
-    <button id="dbgClear">Очистить</button>
+
+    <ul id="dbgHints" class="hidden"></ul>
+
+    <div id="dbgInputRow">
+      <button id="dbgHistUp">↑</button>
+      <button id="dbgHistDown">↓</button>
+      <button id="dbgHintBtn">⚡</button>
+      <input id="dbgCmd" placeholder="введи JS…" />
+      <button id="dbgRun">▶</button>
+      <button id="dbgClear">🗑</button>
+    </div>
   </div>
 </body>
 </html>
