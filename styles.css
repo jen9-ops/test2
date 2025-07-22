@@ -1,46 +1,57 @@
-/* --- базовый фон --- */
+/* ===== GLOBAL ===== */
 html,body{height:100%;margin:0}
 body{
   background:radial-gradient(circle at 20% 20%,#4e54c8 0%,#192f6a 100%);
   color:#fff;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif
 }
 body.dark{background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%)}
+.hidden{display:none!important}
+.d-none{display:none!important}
 
-/* --- navbar --- */
+/* ===== NAVBAR ===== */
 .navbar{
   display:flex;align-items:center;gap:12px;padding:6px 10px;
-  background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:1px solid #888
+  background:rgba(0,0,0,.35);backdrop-filter:blur(6px);
+  border-bottom:1px solid #888
 }
 .brand{font-weight:700;font-size:1.1rem}
 .badge{background:#ffa500;color:#000;padding:2px 6px;border-radius:6px;font-size:.8rem}
 
-/* burger */
-.menu-btn{margin-left:auto;width:40px;height:40px;background:transparent;
-  border:1px solid #fff;border-radius:50%;color:#fff;font-size:1.3rem}
+.menu-btn{
+  margin-left:auto;width:40px;height:40px;background:transparent;
+  border:1px solid #fff;border-radius:50%;color:#fff;font-size:1.3rem
+}
 
-/* dropdown */
+/* ===== DROPDOWN ===== */
 .dropdown{
-  position:absolute;top:54px;right:10px;display:none;
-  background:rgba(0,0,0,.8);border-radius:8px;padding:8px 0;z-index:50
+  position:absolute;top:54px;right:10px;z-index:50;
+  background:rgba(0,0,0,.85);border-radius:8px;padding:8px 0;
+  min-width:220px
 }
 .dropdown button{
-  width:220px;background:none;border:none;color:#fff;text-align:left;
+  display:block;width:100%;background:none;border:none;color:#fff;text-align:left;
   font:inherit;padding:6px 14px;cursor:pointer
 }
-.dropdown hr{border:0;border-top:1px solid #555;margin:6px 0}
 .dropdown button:hover{background:rgba(255,255,255,.15)}
+.dropdown hr{border:0;border-top:1px solid #555;margin:6px 0}
+.dropdown .danger{color:#f55}
 
-/* panels */
-.panel{display:none;padding:8px 12px}
+/* ===== PANELS ===== */
+.panel{padding:8px 12px}
+.panel .actions{margin-top:8px;display:flex;gap:8px}
+.panel .ghost{background:none;border:1px solid rgba(255,255,255,.4);color:#fff}
+
+/* ===== INPUTS ===== */
 .soft{
   background:transparent;border:1px solid rgba(255,255,255,.5);
   border-radius:12px;color:#fff;font:inherit
 }
-textarea.soft{min-height:44px;width:100%;padding:6px}
+textarea.soft{min-height:44px;width:100%;padding:6px;resize:vertical}
+input.soft{height:38px;padding:4px 8px;width:100%}
 
-/* chat */
+/* ===== CHAT ===== */
 .chat{
-  height:calc(100vh - 200px);overflow:auto;padding:10px;
+  height:calc(100vh - 220px);overflow:auto;padding:10px;
   display:flex;flex-direction:column;gap:8px
 }
 .msg{
@@ -50,27 +61,28 @@ textarea.soft{min-height:44px;width:100%;padding:6px}
 .user{align-self:flex-end;background:rgba(255,255,255,.15)}
 .bot {align-self:flex-start;background:rgba(255,255,255,.07)}
 
-/* input bar */
+/* ===== INPUT BAR ===== */
 .inputbar{display:flex;gap:6px;padding:6px 10px;align-items:flex-end}
 .inputbar textarea{flex:1}
-.inputbar button{width:54px;height:44px;background:#007bff;border:none;
-  border-radius:12px;color:#fff;font-size:1.2rem}
+.inputbar button{
+  width:54px;height:44px;background:#007bff;border:none;
+  border-radius:12px;color:#fff;font-size:1.2rem
+}
 
-/* badge */
+/* ===== GPT BADGE ===== */
 #aiIndicator{position:fixed;top:8px;right:80px;background:#00d5ff;padding:2px 6px;border-radius:6px}
-.d-none{display:none}
 
-/* console */
+/* ===== INLINE CONSOLE ===== */
 #dbgToggle{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   background:rgba(0,0,0,.5);color:#fff;font-size:.8rem;
   padding:2px 10px;border-radius:6px 6px 0 0;cursor:pointer;user-select:none;z-index:999
 }
 #dbgPanel{
-  position:fixed;bottom:-260px;left:0;right:0;height:250px;
+  position:fixed;bottom:-260px;left:0;right:0;height:250px;z-index:998;
   background:rgba(0,0,0,.82);color:#0f0;font-size:.7rem;
   overflow:auto;padding:6px 4px 34px;box-sizing:border-box;
-  border-top:1px solid #888;transition:bottom .25s;z-index:998
+  border-top:1px solid #888;transition:bottom .25s
 }
 #dbgPanel.open{bottom:0}
 #dbgPanel pre{margin:0;white-space:pre-wrap}
