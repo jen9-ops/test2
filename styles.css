@@ -1,0 +1,45 @@
+/* ==== фон страницы ==== */
+body{
+  min-height:100vh;
+  /* фиолетово-синий radial-градиент */
+  background:radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
+  /* поддержка auto-тёмной темы */
+  color:#f7f7f7;
+}
+body.dark{
+  background:radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
+}
+
+/* ==== стекло-карточка ==== */
+.glass{
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;
+}
+.navbar.glass{border-radius:0 0 20px 20px;}
+
+/* ==== чат + пузыри ==== */
+.chat{
+  flex:1 1 auto; display:flex; flex-direction:column; gap:10px;
+  padding:14px; overflow-y:auto;
+  border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,.2);
+}
+.msg{
+  max-width:80%; padding:10px 12px; border-radius:12px;
+  white-space:pre-wrap; word-wrap:break-word;
+  animation:bubble .25s ease-out;
+}
+.user{align-self:flex-end;background:rgba(76,175,80,.35);}
+.bot {align-self:flex-start;background:rgba(255,255,255,.18);}
+@keyframes bubble{
+  from{opacity:0;transform:translateY(10px);}
+  to  {opacity:1;transform:none;}
+}
+
+/* ==== кастом scroll-bar (Chrome) ==== */
+.chat::-webkit-scrollbar{width:6px;}
+.chat::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.3); border-radius:3px;
+}
+.chat::-webkit-scrollbar-track{background:transparent;}
