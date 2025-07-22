@@ -1,7 +1,7 @@
 /* -------------- Theme tokens -------------- */
 :root{
-  --user: rgba( 76,175, 80,.35);   /* зелёный 35 % */
-  --bot : rgba(255,255,255,.20);   /* белый 20 %  */
+  --user: rgba( 76,175, 80,.35);
+  --bot : rgba(255,255,255,.20);
   --radius:        12px;
   --blur-strength: 14px;
 }
@@ -24,16 +24,13 @@ body.dark{
   border:1px solid rgba(255,255,255,.15);
   border-radius:var(--radius);
 }
-.navbar.glass{
-  border-radius:0 0 20px 20px;   /* полукруглый низ шапки */
-}
+.navbar.glass{border-radius:0 0 20px 20px;}
 
 /* -------------- Chat container -------------- */
 .chat{
   flex:1 1 auto;
   display:flex; flex-direction:column; gap:10px;
-  padding:14px;
-  overflow-y:auto;
+  padding:14px; overflow-y:auto;
   border-radius:var(--radius);
   box-shadow:0 8px 32px rgba(0,0,0,.2);
   background:rgba(255,255,255,.06);
@@ -41,13 +38,18 @@ body.dark{
   border:1px solid rgba(255,255,255,.15);
 }
 
+/* ▸ НОВОЕ — если в чате нет сообщений, убираем фон и обводку */
+.chat:empty{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+
 /* -------------- Bubbles -------------- */
 .msg{
-  max-width:80%;
-  padding:10px 12px;
+  max-width:80%; padding:10px 12px;
   border-radius:var(--radius);
-  white-space:pre-wrap;
-  word-break:break-word;
+  white-space:pre-wrap; word-break:break-word;
   animation:bubble .25s ease-out;
 }
 .user{align-self:flex-end;background:var(--user);}
@@ -59,10 +61,7 @@ body.dark{
   to  {opacity:1;transform:none;}
 }
 
-/* -------------- Custom scrollbar (Chrome/WebKit) -------------- */
+/* -------------- Custom scrollbar -------------- */
 .chat::-webkit-scrollbar{width:6px;}
-.chat::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.3);
-  border-radius:3px;
-}
+.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px;}
 .chat::-webkit-scrollbar-track{background:transparent;}
