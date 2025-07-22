@@ -1,112 +1,107 @@
-/* ====  глобальные короткие ссылки  ==== */
-const M  = msg => append('ИИ',msg,'bot');
-const $  = sel => document.getElementById(sel);
+/* === helpers === */
+const $ = id => document.getElementById(id);
+const chat = $('chat');
 
-/* ═════════════  menu  ═════════════ */
-const menu = $('menu');
-$('menuBtn').onclick = () => menu.style.display
-  = menu.style.display === 'block' ? 'none' : 'block';
+const append = (from,text,cls)=>{
+  const m=document.createElement('div');m.className=`msg ${cls}`;m.textContent=`${from}: ${text}`;
+  chat.appendChild(m);chat.scrollTop=chat.scrollHeight;return m;
+};
+const badge = $('aiIndicator');
+const menu  = $('menu');
 
-/* ═════════════  train panels  ═════════════ */
-function hidePanels(){ $('trainText').style.display='none'; $('trainURL').style.display='none'; }
-function showTrainText(){ hidePanels(); $('trainText').style.display='block'; menu.style.display='none'; }
-function showTrainURL(){ hidePanels(); $('trainURL').style.display='block'; menu.style.display='none'; }
+/* === memory === */
+let KB      = JSON.parse(localStorage.getItem('KB')||'[]');
+let corpus  = JSON.parse(localStorage.getItem('corpus')||'[]');
+const save  = ()=>{localStorage.setItem('KB',JSON.stringify(KB));localStorage.setItem('corpus',JSON.stringify(corpus));updateBar();};
+const updateBar = ()=>$('progress').textContent=Math.min(100,Math.round(corpus.length/1000))+' %';
 
-/* ═════════════  KB storage  ═════════════ */
-let KB = JSON.parse(localStorage.getItem('KB')||'[]');
-let corpus = JSON.parse(localStorage.getItem('corpus')||'[]');
-const save = ()=>{localStorage.setItem('KB',JSON.stringify(KB));
-                  localStorage.setItem('corpus',JSON.stringify(corpus)); updateBar();};
-function updateBar(){ $('progress').textContent =
-  Math.min(100,Math.round(corpus.length/1000)) + ' %'; }
+/* === burger === */
+$('menuBtn').onclick = ()=>menu.style.display=menu.style.display==='block'?'none':'block';
 
-/* ═════════════  training  ═════════════ */
+/* === train panels === */
+function hidePanels(){ $('trainText').style.display='none';$('trainURL').style.display='none'; }
+function showTrainText(){hidePanels();$('trainText').style.display='block';menu.style.display='none';}
+function showTrainURL(){ hidePanels();$('trainURL').style.display='block';menu.style.display='none';}
+
+/* === training === */
 function trainFromText(){
-  const raw=$('textInput').value.trim(); if(!raw) return alert('Текст?');
-  let pairs=0,single=0;
-  raw.split(/\r?\n+/).forEach(l=>{
-    const p=l.split(' - ');
-    if(p.length===2){KB.push({q:p[0].toLowerCase(),a:p[1]}); pairs++;}
-    else{corpus.push(l); single++;}
+  const raw=$('textInput').value.trim(); if(!raw)return alert('Текст?');
+  let p=0,s=0;
+  raw.split(/\r?\n+/).forEach(line=>{
+    const parts=line.split(' - ');
+    if(parts.length===2){KB.push({q:parts[0].toLowerCase(),a:parts[1]});p++;}
+    else{corpus.push(line);s++;}
   });
-  save(); M(`Обучено: пар ${pairs}, строк ${single}`); $('textInput').value='';
+  save();append('ИИ',`Загружено: пар ${p}, предложений ${s}`,'bot');$('textInput').value='';
 }
 async function trainFromURL(){
-  const url=$('urlInput').value.trim(); if(!url) return alert('URL?');
-  const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url));
-  const {contents}=await r.json();
-  const txt=[...new DOMParser().parseFromString(contents,'text/html').querySelectorAll('p')].map(p=>p.textContent.trim()).join(' ');
-  txt.split(/[.!?\n]+/).filter(Boolean).forEach(s=>{KB.push({q:s.toLowerCase(),a:s}); corpus.push(s);});
-  save(); M('С URL обучено: '+txt.length); $('urlInput').value='';
+  const u=$('urlInput').value.trim();if(!u)return alert('URL?');
+  const d=await(await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(u))).json();
+  const txt=[...new DOMParser().parseFromString(d.contents,'text/html').querySelectorAll('p')].map(p=>p.textContent.trim()).join(' ');
+  txt.split(/[.!?\n]+/).filter(Boolean).forEach(s=>{KB.push({q:s.toLowerCase(),a:s});corpus.push(s);});
+  save();append('ИИ','С URL обучено','bot');$('urlInput').value='';
 }
 
-/* ═════════════  KB search  ═════════════ */
-const sim=(a,b)=>a.split(/\s+/).filter(x=>b.includes(x)).length/Math.max(a.split(/\s+/).length,b.length);
-function kbFind(q){
-  let best=null,s=0;
-  KB.forEach(e=>{const c=sim(q,e.q); if(c>s){s=c;best=e;}});
-  return s>0.35?best.a:null;
-}
+/* === KB search === */
+function sim(a,b){const w1=a.split(/\s+/),w2=b.split(/\s+/);return w1.filter(x=>w2.includes(x)).length/Math.max(w1.length,w2.length);}
+function kbFind(q){let best=null,s=0;KB.forEach(e=>{const c=sim(q,e.q);if(c>s){s=c;best=e;}});return s>0.35?best.a:null;}
 
-/* ═════════════  distilgpt-2  ═════════════ */
-let gpt=null, activeWait=null;
+/* === GPT model === */
+let gpt=null, waitBubble=null;
 async function loadModel(){
   if(gpt) return;
-  if(!window.transformers){M('⚠ transformers.min.js не подключён!');throw 0;}
+  if(!window.transformers){append('ИИ','⚠ transformers.min.js не подключён!','bot');throw 0;}
   const {pipeline,env}=window.transformers;
-  env.onprogress=p=>{if(activeWait)activeWait.textContent=`ИИ: качаю ${(p*100|0)} %`;};
+  env.onprogress=p=>{if(waitBubble)waitBubble.textContent=`ИИ: качаю ${(p*100|0)} %`;};
   gpt=await pipeline('text-generation','Xenova/distilgpt2',{quantized:true});
 }
-async function aiGenerate(prompt){
+async function ai(prompt){
   await loadModel();
   const o=await gpt(prompt+'\n```powershell\n',{max_new_tokens:60,temperature:.3,stop:['```']});
   return o[0].generated_text.split('```powershell')[1]?.replace('```','')?.trim();
 }
 
-/* ═════════════  ask  ═════════════ */
+/* === ask === */
 async function ask(){
-  const q=$('userInput').value.trim(); if(!q) return;
+  const q=$('userInput').value.trim(); if(!q)return;
   append('Ты',q,'user'); $('userInput').value='';
 
-  if(/^анализ/i.test(q)){M(analysis());return;}
-
-  if(q.includes(' - ')){const[p,a]=q.split(' - '); KB.push({q:p.toLowerCase(),a}); save(); M('Запомнил!');return;}
+  if(/^анализ/i.test(q)){append('ИИ',analysis(),'bot');return;}
+  if(q.includes(' - ')){const[p,a]=q.split(' - ');KB.push({q:p.toLowerCase(),a});save();append('ИИ','Запомнил!','bot');return;}
 
   let ans=kbFind(q.toLowerCase());
   if(!ans){
-    activeWait=append('ИИ','ИИ: качаю 0 %','bot'); $('aiIndicator').classList.remove('d-none');
-    try{ ans=await Promise.race([aiGenerate(`Напиши PowerShell-скрипт: ${q}`),new Promise((_,rej)=>setTimeout(()=>rej('timeout'),30000))]);}
+    waitBubble=append('ИИ','ИИ: качаю 0 %','bot'); badge.classList.remove('d-none');
+    try{ans=await Promise.race([ai(`Напиши PowerShell-скрипт: ${q}`),new Promise((_,rej)=>setTimeout(()=>rej('timeout'),30000))]);}
     catch(e){ans='⚠ GPT-2 не ответил: '+e;}
-    $('aiIndicator').classList.add('d-none');
-    activeWait.textContent='ИИ: '+ans; activeWait=null; return;
+    badge.classList.add('d-none'); waitBubble.textContent='ИИ: '+ans; waitBubble=null; return;
   }
-  M(ans);
+  append('ИИ',ans,'bot');
 }
 
-/* ═════════════  analysis  ═════════════ */
-const stop=new Set('и в во не что он на я ...'.split(' '));
+/* === analysis === */
 function analysis(){
-  if(!corpus.length)return'Корпус пуст!';let total=0,f={};
-  corpus.forEach(s=>s.toLowerCase().split(/[^\\p{L}0-9]+/u).forEach(w=>{if(!w||stop.has(w))return;total++;f[w]=(f[w]||0)+1;}));
+  if(!corpus.length)return'Корпус пуст!';
+  let total=0,f={}; corpus.forEach(s=>s.toLowerCase().split(/[^\\p{L}0-9]+/u).forEach(w=>{if(!w)return;total++;f[w]=(f[w]||0)+1;}));
   const avg=(total/corpus.length).toFixed(1);
   const top=Object.entries(f).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([w,c])=>`${w}(${c})`).join(', ');
-  return`Всего предложений: ${corpus.length}\nСредняя длина: ${avg}\nТоп-10 слов: ${top}`;
+  return`Всего: ${corpus.length}\nСредняя длина: ${avg}\nТоп-10: ${top}`;
 }
 
-/* ═════════════  backup  ═════════════ */
+/* === backup === */
 function exportData(){const blob=new Blob([JSON.stringify({KB,corpus})],{type:'application/json'});
   Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'bot-memory.json'}).click();}
 function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=ev=>{const d=JSON.parse(ev.target.result);if(d.KB&&d.corpus){KB=d.KB;corpus=d.corpus;save();M('Память загружена!');}};
+  r.onload=ev=>{const d=JSON.parse(ev.target.result);if(d.KB&&d.corpus){KB=d.KB;corpus=d.corpus;save();append('ИИ','Память загружена!','bot');}};
   r.readAsText(f);}
-function clearMemory(){if(confirm('Удалить все знания?')){KB=[];corpus=[];localStorage.clear();save();clearChat();M('Память очищена');}}
-function clearChat(){ $('chat').innerHTML=''; }
+function clearMemory(){if(confirm('Удалить все знания?')){KB=[];corpus=[];localStorage.clear();save();chat.innerHTML='';append('ИИ','Память очищена','bot');}}
+function clearChat(){chat.innerHTML='';}
 
-/* ═════════════  console  ═════════════ */
+/* === console === */
 (()=>{const box=$('dbgLog'),toggle=$('dbgToggle'),panel=$('dbgPanel'),clr=$('dbgClear');
-const log=(t,a)=>{box.textContent+=`[${t}] ${[...a].join(' ')}\n`;box.scrollTop=box.scrollHeight;};
-['log','warn','error'].forEach(fn=>{const o=console[fn];console[fn]=(...a)=>{o.apply(console,a);log(fn,a);};});
-toggle.onclick=()=>panel.classList.toggle('open'); clr.onclick=()=>box.textContent=''; console.log('🔧 Debug console ready'); })();
+['log','warn','error'].forEach(fn=>{const o=console[fn];console[fn]=(...a)=>{o(...a);box.textContent+=`[${fn}] ${a.join(' ')}\n`;box.scrollTop=box.scrollHeight;};});
+toggle.onclick=()=>panel.classList.toggle('open'); clr.onclick=()=>box.textContent='';
+console.log('🔧 Debug console ready');})();
 
-/* ═════════════  keysend  ═════════════ */
+/* === hot-key === */
 $('userInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();ask();}});
