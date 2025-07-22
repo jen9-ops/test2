@@ -108,6 +108,18 @@ body:not(.dark) .form-control.soft::placeholder{
 .user{ align-self: flex-end; background: var(--user); }
 .bot { align-self: flex-start; background: var(--bot); }
 
+/* 1 ── читаемый текст внутри раскрытого меню  */
+/*    светлая + тёмная тема сразу             */
+.dropdown-menu.glass .dropdown-item{
+  color: inherit !important;           /* наследует белый / чёрный из body */
+  font-weight: 500;                    /* чуть толще для контраста         */
+}
+
+/* 2 ── меню не прилипает к навбару, а отступает ↓ 8 px */
+.navbar .dropdown-menu{
+  margin-top: .5rem;                   /* 0.5 rem ~ 8 px                   */
+}
+
 @keyframes bubble{
   from{ opacity: 0; transform: translateY(10px); }
   to  { opacity: 1; transform: none; }
