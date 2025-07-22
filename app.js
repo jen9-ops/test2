@@ -1,18 +1,32 @@
 /* =========================================================
-   Hyper-Bot  •  app.js  • мобильная консоль + история + подсказки
+   Hyper-Bot  app.js  (mobile console + history + autocomplete)
    ========================================================= */
 
 const $ = id => document.getElementById(id);
 const chat = $('chat');
 const badge = $('aiIndicator');
 
+/* ---------- safe console hook very early ---------- */
+(() => {
+  const orig = {...console};
+  window.__dbgBuffer = [];
+  ['log','warn','error','info'].forEach(fn=>{
+    console[fn] = (...a)=>{
+      orig[fn](...a);
+      window.__dbgBuffer.push([fn,a]);
+    };
+  });
+})();
+
 /* ---------- helpers ---------- */
-const append = (who,text,cls)=>{
-  const d=document.createElement('div');
-  d.className=`msg ${cls}`; d.textContent=`${who}: ${text}`;
-  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+function append(who, text, cls) {
+  // зеркалим в консоль
+  console.log(`[UI] ${who}: ${text}`);
+  const d = document.createElement('div');
+  d.className = `msg ${cls}`; d.textContent = `${who}: ${text}`;
+  chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
   return d;
-};
+}
 
 const hidePanels=()=>{$('trainText').classList.add('hidden');$('trainURL').classList.add('hidden');};
 function showTrainText(){hidePanels();$('trainText').classList.remove('hidden');}
@@ -33,6 +47,9 @@ $('menu').addEventListener('click',e=>{
     case 'clearChat': clearChat();     break;
     case 'clearMemory': clearMemory(); break;
     case 'theme':     toggleTheme();   break;
+    case 'doTrainText': trainFromText(); break;
+    case 'doTrainURL' : trainFromURL();  break;
+    case 'closePanels': hidePanels();  break;
   }
 });
 document.body.addEventListener('click',e=>{
@@ -76,21 +93,54 @@ async function trainFromURL(){
     });
     save(); append('ИИ','С URL обучено','bot');
     $('urlInput').value=''; hidePanels();
-  }catch(err){ alert('Не удалось загрузить URL: '+err); }
+  }catch(err){ console.error('trainFromURL',err); alert('Не удалось загрузить URL: '+err); }
 }
 
 /* ---------- KB search ---------- */
 function sim(a,b){const w1=a.split(/\s+/),w2=b.split(/\s+/);return w1.filter(x=>w2.includes(x)).length/Math.max(w1.length,w2.length);}
 function kbFind(q){let best=null,s=0;KB.forEach(e=>{const c=sim(q,e.q);if(c>s){s=c;best=e;}});return s>0.35?best.a:null;}
 
+/* ---------- transformers loader ---------- */
+async function ensureTransformersLoaded(){
+  if(window.transformers?.pipeline) return true;
+  console.warn('Transformers not found, trying to attach dynamically...');
+  // попробуем подключить локально ещё раз
+  await new Promise(resolve=>{
+    const s=document.createElement('script');
+    s.src='transformers.min.js'; s.onload=resolve; s.onerror=resolve;
+    document.head.appendChild(s);
+  });
+  if(window.transformers?.pipeline) return true;
+
+  // как fallback — CDN
+  await new Promise(resolve=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js';
+    s.onload=resolve; s.onerror=resolve;
+    document.head.appendChild(s);
+  });
+  return !!window.transformers?.pipeline;
+}
+
 /* ---------- GPT model ---------- */
 let gpt=null, waitBubble=null;
 async function loadModel(){
   if(gpt) return;
-  if(!window.transformers){append('ИИ','⚠ transformers.min.js не подключён!','bot');throw new Error('no transformers');}
-  const {pipeline,env}=window.transformers;
-  env.onprogress=p=>{if(waitBubble)waitBubble.textContent=`ИИ: качаю ${(p*100|0)} %`;};
-  gpt=await pipeline('text-generation','Xenova/distilgpt2',{quantized:true});
+  const ok = await ensureTransformersLoaded();
+  if(!ok){ append('ИИ','⚠ transformers.min.js не подключён!','bot'); throw new Error('no transformers'); }
+
+  const {pipeline, env} = window.transformers;
+  try{
+    // локальный WASM (если файлы лежат рядом)
+    if(env?.onnx?.wasm) env.onnx.wasm.wasmPaths = './';
+    console.log('▶ Загружаю DistilGPT-2…');
+    env.onprogress=p=>{if(waitBubble)waitBubble.textContent=`ИИ: качаю ${(p*100|0)} %`;};
+    gpt=await pipeline('text-generation','Xenova/distilgpt2',{quantized:true});
+    console.log('✔ Модель готова');
+  }catch(e){
+    console.error('loadModel error',e);
+    throw e;
+  }
 }
 async function ai(prompt){
   await loadModel();
@@ -116,8 +166,8 @@ async function ask(){
     waitBubble=append('ИИ','ИИ: качаю 0 %','bot');
     badge.classList.remove('d-none');
     const timeout=new Promise((_,rej)=>setTimeout(()=>rej('timeout'),30_000));
-    try{ans=await Promise.race([ai(`Напиши PowerShell-скрипт: ${q}`),timeout]);}
-    catch(e){ans='⚠ GPT-2 не ответил: '+e;}
+    try{ ans=await Promise.race([ ai(`Напиши PowerShell-скрипт: ${q}`), timeout ]); }
+    catch(e){ console.error('GPT-2 error',e); ans='⚠ GPT-2 не ответил: '+e; }
     badge.classList.add('d-none');
     waitBubble.textContent='ИИ: '+ans; waitBubble=null;
     return;
@@ -193,6 +243,12 @@ function clearChat(){ chat.innerHTML=''; }
     logBox.scrollTop=logBox.scrollHeight;
   }
 
+  // слить накопленное, подключённое раньше
+  if(window.__dbgBuffer){
+    window.__dbgBuffer.forEach(([t,a])=>log(t,...a));
+    window.__dbgBuffer=null;
+  }
+
   ['log','warn','error','info'].forEach(fn=>{
     const orig=console[fn];
     console[fn]=(...a)=>{orig.apply(console,a);log(fn,...a);};
@@ -203,7 +259,8 @@ function clearChat(){ chat.innerHTML=''; }
   function pushHistory(cmd){
     if(!cmd.trim())return;
     if(history[history.length-1]!==cmd){
-      history.push(cmd); if(history.length>MAX_HISTORY) history=history.slice(-MAX_HISTORY);
+      history.push(cmd);
+      if(history.length>MAX_HISTORY) history=history.slice(-MAX_HISTORY);
       localStorage.setItem('dbgHistory',JSON.stringify(history));
     }
     histPos=history.length;
@@ -213,7 +270,7 @@ function clearChat(){ chat.innerHTML=''; }
 
   function getCandidates(prefix){
     if(!prefix) return [];
-    const gl = Object.getOwnPropertyNames(window);
+    const gl=Object.getOwnPropertyNames(window);
     gl.push('KB','corpus','ask','trainFromText','trainFromURL','showAnalysis');
     return [...new Set(gl)].filter(w=>w.toLowerCase().startsWith(prefix.toLowerCase())).sort();
   }
@@ -278,7 +335,7 @@ function clearChat(){ chat.innerHTML=''; }
   console.log('🔧 Interactive console ready (mobile full-screen)');
 })();
 
-/* Экспортируем функции, если нужно вызывать из консоли */
+/* Экспортируем функции (удобно из консоли) */
 Object.assign(window,{
   showTrainText,showTrainURL,showAnalysis,
   trainFromText,trainFromURL,
