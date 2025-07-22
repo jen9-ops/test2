@@ -1,92 +1,119 @@
-/* ========== HEIGHT ========== */
-html, body{height:100%}
+/* =======================================================
+   Hyper-Bot  •  Ultra-Clean Theme
+   -------------------------------------------------------
+   • только два фона: основной градиент страницы
+     и панель шапки (navbar)
+   • все остальные элементы полностью прозрачные
+     (background:none / border:none) и пишут белым
+   ======================================================= */
 
-/* ========== TOKENS ========== */
+/* полный рост */
+html, body { height: 100%; }
+
+/* общие переменные */
 :root{
-  --r       : 12px;
-  --userMsg : rgba( 76,175, 80,.35);
-  --botMsg  : rgba(255,255,255,.20);
-  --softBg  : rgba(255,255,255,.08);
-  --softBd  : rgba(255,255,255,.25);
+  --r           : 12px;                      /* скругления */
+  --white       : #ffffff;
+  --userBubble  : rgba(255,255,255,.15);     /* лёгкая рамка-пузырь   */
+  --botBubble   : rgba(255,255,255,.07);
 }
 
-/* ========== PAGE BG ========== */
+/* ░░ 1.  Фоны страницы и шапки ░░ */
 body{
-  background:radial-gradient(circle at 20% 20%,#4e54c8 0%,#192f6a 100%);
-  color:#fff;                       /* ← теперь белый сразу */
+  background: radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
+  color: var(--white);                      /* белый шрифт по умолчанию */
 }
 body.dark{
-  background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%);
-  color:#fff;
-  --softBg:rgba(255,255,255,.05);
-  --softBd:rgba(255,255,255,.35);
+  background: radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
+  color: var(--white);
 }
 
-/* ========== PANELS ========== */
-.glass{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--r);
+/* шапка-navbar — единственная полупрозрачная панель */
+.navbar{
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,.25);
 }
-
-/* ========== NAVBAR ========== */
 .navbar .navbar-brand,
-.navbar .nav-link{color:#fff}
-.navbar .nav-link:hover{color:#0d6efd}
+.navbar .nav-link{ color: var(--white); }
+.navbar .nav-link:hover{ color:#0d6efd; }
 
-/* ========== BURGER BTN ========== */
-.menu-btn{
-  width:42px;height:42px;padding:0;display:grid;place-items:center;
-  background:var(--softBg);border:1px solid var(--softBd);border-radius:50%;color:#fff;
-}
-.menu-btn:hover{background:rgba(255,255,255,.12)}
-
-/* ========== DROPDOWN ========== */
-.dropdown-menu.glass{
-  min-width:220px;font-size:.9rem;margin-top:.5rem;
-  background:rgba(0,0,0,.80);      /* плотный тёмный в обеих темах */
-  color:#fff;                      /* белый текст */
-  border:1px solid rgba(255,255,255,.25);
+/* ░░ 2.  Выпадающее меню ░░ */
+.dropdown-menu{
+  background: transparent;                 /* 100 % прозрачность   */
+  border: none;
+  color: var(--white);
+  min-width: 220px;
+  font-size: .9rem;
+  margin-top: .5rem;                       /* отступ от шапки */
 }
 .dropdown-item{
-  padding:.35rem .85rem;
-  color:#fff!important;            /* контрастные пункты */
-  font-weight:500;
+  padding: .35rem .85rem;
+  color: var(--white) !important;
 }
-.dropdown-item:hover{background:rgba(255,255,255,.15)}
+.dropdown-item:hover{
+  background: rgba(255,255,255,.15);       /* лишь подсветка курсора */
+}
 
-/* ========== SOFT INPUTS ========== */
+/* бургер-кнопка */
+.menu-btn{
+  width: 42px; height: 42px; padding: 0;
+  display: grid; place-items: center;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 50%;
+  color: var(--white);
+}
+.menu-btn:hover{ background: rgba(255,255,255,.1); }
+
+/* ░░ 3.  “Софт” поля ввода / textarea ░░ */
 .form-control.soft,
 textarea.soft{
-  background:var(--softBg);border:1px solid var(--softBd);
-  border-radius:var(--r);color:#fff;resize:vertical;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: var(--r);
+  color: var(--white);
+  resize: vertical;
 }
-textarea.soft{min-height:44px}
+textarea.soft{ min-height:44px; }
 .form-control.soft::placeholder,
-textarea.soft::placeholder{color:rgba(255,255,255,.9)}   /* яркий белый */
+textarea.soft::placeholder{ color: var(--white); opacity:.65; }
 
-/* ========== CHAT ========== */
+/* ░░ 4.  Чат-контейнер ░░ */
 .chat{
-  display:flex;flex-direction:column;gap:10px;padding:14px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--r);
-  box-shadow:0 8px 24px rgba(0,0,0,.15);
+  display:flex; flex-direction:column; gap:10px;
+  padding: 4px 0;                          /* практически без отступов */
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
-.chat:empty{background:transparent;border:none;box-shadow:none}
-.chat::-webkit-scrollbar{width:6px}
-.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px}
+.chat::-webkit-scrollbar       { width: 6px; }
+.chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,.3); border-radius: 3px; }
 
-/* ========== BUBBLES ========== */
+/* ░░ 5.  Сообщения ░░ */
 .msg{
-  max-width:80%;padding:10px 12px;border-radius:var(--r);
-  white-space:pre-wrap;word-break:break-word;
-  animation:bubble .25s ease-out;
+  max-width: 80%;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  white-space: pre-wrap; word-break: break-word;
+  animation: bubble .25s ease-out;
+  border: 1px solid rgba(255,255,255,.35);
 }
-.user{align-self:flex-end;background:var(--userMsg)}
-.bot {align-self:flex-start;background:var(--botMsg)}
-@keyframes bubble{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.user{ align-self: flex-end; background: var(--userBubble); }
+.bot { align-self: flex-start; background: var(--botBubble ); }
 
-/* ========== GPT BADGE ========== */
-#aiIndicator{animation:pulse .9s infinite alternate}
-@keyframes pulse{from{opacity:.6}to{opacity:1}}
+@keyframes bubble{
+  from{ opacity:0; transform:translateY(10px);}
+  to  { opacity:1; transform:none; }
+}
+
+/* ░░ 6.  Бейдж GPT-2 ░░ */
+#aiIndicator{
+  animation: pulse .9s infinite alternate;
+  color: var(--white);
+  background: rgba(0,0,0,.45);
+}
+@keyframes pulse{ from{opacity:.5;} to{opacity:1;} }
+
+/* ░░ 7.  Общие ссылки / кнопки ░░ */
+a, button{ color: var(--white); }
