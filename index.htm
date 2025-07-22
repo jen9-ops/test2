@@ -4,16 +4,13 @@
   <meta charset="UTF-8" />
   <title>Hyper-Bot 🎓</title>
 
-  
-
   <meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
+        content="width=device-width,initial-scale=1.0,
+                 maximum-scale=1.0,user-scalable=no">
+
   <link rel="icon" href="ico.ico" />
 
-  <!-- Bootstrap & Icons -->
+  <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
@@ -22,11 +19,11 @@
 </head>
 
 <body class="d-flex flex-column h-100">
-  <!-- ── NAVBAR ─────────────────────────────────────────────── -->
+  <!-- NAVBAR -->
   <header class="navbar glass shadow-sm px-3">
     <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
       <i class="bi bi-robot"></i> Hyper-Bot
-      <span id="progress"    class="badge bg-warning text-dark ms-1">0 %</span>
+      <span id="progress" class="badge bg-warning text-dark ms-1">0 %</span>
       <span id="aiIndicator" class="badge bg-info text-dark ms-1 d-none">GPT-2</span>
     </a>
 
@@ -35,7 +32,7 @@
         <i class="bi bi-list fs-4"></i>
       </button>
 
-      <ul class="dropdown-menu dropdown-menu-end glass p-2 shadow-lg">
+      <ul class="dropdown-menu glass dropdown-menu-end p-2 shadow-lg">
         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlText"><i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlURL"><i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
         <li><a class="dropdown-item" href="#" onclick="showAnalysis()"><i class="bi bi-bar-chart me-1"></i>Анализ</a></li>
@@ -54,7 +51,7 @@
     </div>
   </header>
 
-  <!-- ── MAIN ──────────────────────────────────────────────── -->
+  <!-- MAIN -->
   <main class="flex-grow-1 d-flex flex-column gap-2 p-3 overflow-hidden">
     <div id="chat" class="chat glass flex-grow-1 overflow-auto"></div>
 
@@ -67,27 +64,32 @@
 
   <input id="fileInput" type="file" accept="application/json" class="d-none" onchange="importData(event)">
 
-  <!-- Модал: текст -->
-  <div id="mdlText" class="modal fade"><div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content glass p-3">
-      <h5 class="modal-title mb-3"><i class="bi bi-pencil-square me-2"></i>Обучить по тексту</h5>
-      <textarea id="textInput" rows="6" class="form-control soft mb-3" placeholder="Вставь текст для обучения…"></textarea>
-      <div class="text-end">
-        <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
-        <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromText()">Обучить</button>
+  <!-- MODALS -->
+  <div id="mdlText" class="modal fade">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content glass p-3">
+        <h5 class="modal-title mb-3"><i class="bi bi-pencil-square me-2"></i>Обучить по тексту</h5>
+        <textarea id="textInput" rows="6" class="form-control soft mb-3" placeholder="Вставь текст для обучения…"></textarea>
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromText()">Обучить</button>
+        </div>
       </div>
-    </div></div></div>
+    </div>
+  </div>
 
-  <!-- Модал: URL -->
-  <div id="mdlURL" class="modal fade"><div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content glass p-3">
-      <h5 class="modal-title mb-3"><i class="bi bi-link-45deg me-2"></i>Обучить по URL</h5>
-      <input id="urlInput" class="form-control soft mb-3" placeholder="https://пример.ru/статья">
-      <div class="text-end">
-        <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
-        <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromURL()">Загрузить</button>
+  <div id="mdlURL" class="modal fade">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content glass p-3">
+        <h5 class="modal-title mb-3"><i class="bi bi-link-45deg me-2"></i>Обучить по URL</h5>
+        <input id="urlInput" class="form-control soft mb-3" placeholder="https://пример.ru/статья">
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromURL()">Загрузить</button>
+        </div>
       </div>
-    </div></div></div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
