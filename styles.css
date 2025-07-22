@@ -1,80 +1,77 @@
-/* =====  базовый фон  ===== */
-html,body{height:100%}
+/* --- базовый фон --- */
+html,body{height:100%;margin:0}
 body{
-  margin:0;
   background:radial-gradient(circle at 20% 20%,#4e54c8 0%,#192f6a 100%);
-  color:#fff;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  color:#fff;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif
 }
-body.dark{background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%);}
+body.dark{background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%)}
 
-/* =====  navbar  ===== */
+/* --- navbar --- */
 .navbar{
-  display:flex;align-items:center;gap:14px;
-  padding:6px 10px;background:rgba(0,0,0,.35);
-  backdrop-filter:blur(6px);border-bottom:1px solid #888;
+  display:flex;align-items:center;gap:12px;padding:6px 10px;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:1px solid #888
 }
-.brand{font-weight:700;font-size:1.2rem}
-.badge{background:#ffaa00;color:#000;padding:2px 6px;border-radius:6px;font-size:.8rem}
+.brand{font-weight:700;font-size:1.1rem}
+.badge{background:#ffa500;color:#000;padding:2px 6px;border-radius:6px;font-size:.8rem}
 
-/* =====  burger  ===== */
-.menu-btn{
-  margin-left:auto;width:40px;height:40px;background: transparent;
-  border:1px solid #fff;border-radius:50%;color:#fff;font-size:1.4rem;
-}
+/* burger */
+.menu-btn{margin-left:auto;width:40px;height:40px;background:transparent;
+  border:1px solid #fff;border-radius:50%;color:#fff;font-size:1.3rem}
 
-/* =====  dropdown  ===== */
+/* dropdown */
 .dropdown{
   position:absolute;top:54px;right:10px;display:none;
-  background:rgba(0,0,0,.8);padding:8px 0;border-radius:8px;
+  background:rgba(0,0,0,.8);border-radius:8px;padding:8px 0;z-index:50
 }
 .dropdown button{
-  display:block;width:220px;text-align:left;background:none;border:none;
-  color:#fff;padding:6px 14px;font:inherit;cursor:pointer;
+  width:220px;background:none;border:none;color:#fff;text-align:left;
+  font:inherit;padding:6px 14px;cursor:pointer
 }
 .dropdown hr{border:0;border-top:1px solid #555;margin:6px 0}
-.dropdown button:hover{background:rgba(255,255,255,.12)}
+.dropdown button:hover{background:rgba(255,255,255,.15)}
 
-/* =====  panels  ===== */
-.panel{display:none;padding:6px 10px}
-
-/* =====  chat  ===== */
-.chat{
-  height:calc(100vh - 190px);overflow:auto;padding:10px;
-  display:flex;flex-direction:column;gap:8px;
+/* panels */
+.panel{display:none;padding:8px 12px}
+.soft{
+  background:transparent;border:1px solid rgba(255,255,255,.5);
+  border-radius:12px;color:#fff;font:inherit
 }
-.msg{max-width:80%;padding:10px;border:1px solid rgba(255,255,255,.35);
-     border-radius:12px;white-space:pre-wrap;word-break:break-word}
+textarea.soft{min-height:44px;width:100%;padding:6px}
+
+/* chat */
+.chat{
+  height:calc(100vh - 200px);overflow:auto;padding:10px;
+  display:flex;flex-direction:column;gap:8px
+}
+.msg{
+  max-width:80%;padding:10px;border:1px solid rgba(255,255,255,.35);
+  border-radius:12px;white-space:pre-wrap;word-break:break-word
+}
 .user{align-self:flex-end;background:rgba(255,255,255,.15)}
 .bot {align-self:flex-start;background:rgba(255,255,255,.07)}
 
-/* =====  input bar  ===== */
-.inputbar{
-  display:flex;gap:6px;padding:6px 10px;align-items:flex-end;
-}
-.soft{
-  background:transparent;border:1px solid rgba(255,255,255,.5);
-  border-radius:12px;color:#fff;font:inherit;
-}
-#userInput{flex:1;min-height:44px;padding:6px}
-#sendBtn{width:54px;height:44px;background:#0066ff;border:none;
-         color:#fff;font-size:1.2rem;border-radius:12px}
+/* input bar */
+.inputbar{display:flex;gap:6px;padding:6px 10px;align-items:flex-end}
+.inputbar textarea{flex:1}
+.inputbar button{width:54px;height:44px;background:#007bff;border:none;
+  border-radius:12px;color:#fff;font-size:1.2rem}
 
-/* =====  GPT-badge  ===== */
-#aiIndicator{position:fixed;top:8px;right:72px;background:#00d5ff;padding:2px 6px;border-radius:6px}
+/* badge */
+#aiIndicator{position:fixed;top:8px;right:80px;background:#00d5ff;padding:2px 6px;border-radius:6px}
 .d-none{display:none}
 
-/* =====  console  ===== */
+/* console */
 #dbgToggle{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   background:rgba(0,0,0,.5);color:#fff;font-size:.8rem;
-  padding:2px 10px;border-radius:6px 6px 0 0;user-select:none;cursor:pointer;z-index:999
+  padding:2px 10px;border-radius:6px 6px 0 0;cursor:pointer;user-select:none;z-index:999
 }
 #dbgPanel{
-  position:fixed;bottom:-260px;left:0;right:0;height:250px;z-index:998;
-  background:rgba(0,0,0,.8);color:#0f0;font-size:.7rem;
+  position:fixed;bottom:-260px;left:0;right:0;height:250px;
+  background:rgba(0,0,0,.82);color:#0f0;font-size:.7rem;
   overflow:auto;padding:6px 4px 34px;box-sizing:border-box;
-  border-top:1px solid #888;transition:bottom .25s;
+  border-top:1px solid #888;transition:bottom .25s;z-index:998
 }
 #dbgPanel.open{bottom:0}
 #dbgPanel pre{margin:0;white-space:pre-wrap}
-#dbgClear{position:absolute;right:8px;bottom:4px;background:#444;border:none;color:#fff;font-size:.7rem;padding:2px 6px}
+#dbgClear{position:absolute;right:8px;bottom:4px;background:#444;color:#fff;border:none;border-radius:4px;font-size:.7rem;padding:2px 6px}
