@@ -8,10 +8,9 @@ const consoleBox = $("#console");
 const grip = $("#console-grip");
 
 let pipe = null;
-let memory = []; // простая "память"
+let memory = [];
 let isDark = true;
 
-// ========================= UTILS =========================
 function log(...args) {
   const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
   const time = new Date().toLocaleTimeString();
@@ -27,9 +26,7 @@ function saveFile(name, dataStr) {
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  a.click();
+  a.href = url; a.download = name; a.click();
   URL.revokeObjectURL(url);
 }
 function toggleTheme() {
@@ -37,7 +34,6 @@ function toggleTheme() {
   document.documentElement.classList.toggle('light', !isDark);
 }
 
-// ========================= MODEL INIT =========================
 async function loadModel() {
   const modelName = $("#model-select").value;
   log(`🔄 Загружаю модель: ${modelName} ...`);
@@ -45,10 +41,8 @@ async function loadModel() {
 
   pipe = await pipeline("text-generation", modelName, {
     progress_callback: (p) => {
-      // p: { status, loaded, total, file }
       if (p && p.total) {
-        const pct = (p.loaded / p.total) * 100;
-        setProgress(pct);
+        setProgress((p.loaded / p.total) * 100);
       }
       if (p.status) log(`[dl] ${p.status}: ${p.file || ''} (${p.loaded}/${p.total})`);
     }
@@ -58,7 +52,6 @@ async function loadModel() {
   log("✅ Модель загружена");
 }
 
-// ========================= HANDLERS =========================
 async function onGenerate() {
   if (!pipe) await loadModel();
 
@@ -68,7 +61,7 @@ async function onGenerate() {
   const maxTokens = +$("#max-tokens").value || 128;
   const temperature = +$("#temperature").value || 0.7;
 
-  log("🧠 Генерирую...");
+  log(`🧠 Генерация... (max_tokens=${maxTokens}, temp=${temperature})`);
   try {
     const out = await pipe(prompt, {
       max_new_tokens: maxTokens,
@@ -86,19 +79,18 @@ function onTrainText() {
   const txt = prompt("Вставь обучающий текст:");
   if (!txt) return;
   memory.push({ type: "text", data: txt, ts: Date.now() });
-  log(`📥 Записан текст в память (${txt.length} симв.)`);
+  log(`📥 Текст добавлен в память (${txt.length} симв.)`);
 }
 
 async function onTrainURL() {
   const url = prompt("Вставь URL:");
   if (!url) return;
-
   log(`🌐 Скачиваю ${url}...`);
   try {
     const res = await fetch(url);
     const t = await res.text();
     memory.push({ type: "url", url, data: t, ts: Date.now() });
-    log(`📥 В память добавлен контент с ${url} (${t.length} симв.)`);
+    log(`📥 Контент с ${url} добавлен (${t.length} симв.)`);
   } catch (e) {
     log("❌ Не удалось получить URL", e);
   }
@@ -107,7 +99,7 @@ async function onTrainURL() {
 function onSaveMemory() {
   if (!memory.length) return log("⚠ Память пуста");
   saveFile("memory.json", JSON.stringify(memory, null, 2));
-  log("💾 Память выгружена в memory.json");
+  log("💾 Память выгружена -> memory.json");
 }
 
 function onReset() {
@@ -115,14 +107,11 @@ function onReset() {
   logEl.textContent = "";
   setProgress(0);
   pipe = null;
-  log("♻ Сброшено. Модель выгружена из памяти вкладки.");
+  log("♻ Сброс: модель выгружена, память очищена.");
 }
+function onClearLog() { logEl.textContent = ""; }
 
-function onClearLog() {
-  logEl.textContent = "";
-}
-
-// ========================= DRAG CONSOLE =========================
+// Drag console
 (function initDrag() {
   let startY = 0;
   let startHeight = 0;
@@ -146,20 +135,16 @@ function onClearLog() {
 
   grip.addEventListener("mousedown", down);
   grip.addEventListener("touchstart", down, { passive: false });
-
   window.addEventListener("mousemove", move);
   window.addEventListener("touchmove", move, { passive: false });
-
   window.addEventListener("mouseup", up);
   window.addEventListener("touchend", up);
 })();
 
-// Двойной тап/клик по grip — полноэкранная консоль
 grip.addEventListener("dblclick", () => {
   consoleBox.classList.toggle("fullscreen");
 });
 
-// ========================= BIND UI =========================
 $("#btn-generate").addEventListener("click", onGenerate);
 $("#btn-train-text").addEventListener("click", onTrainText);
 $("#btn-train-url").addEventListener("click", onTrainURL);
@@ -173,5 +158,4 @@ $("#model-select").addEventListener("change", () => {
   log("🔁 Модель будет перезагружена при следующей генерации.");
 });
 
-// Автолог приветствия
-log("Привет! Нажми «Сгенерировать», чтобы начать. Или обучи память.");
+log("Привет! Старый дизайн возвращён. Жми «Сгенерировать» или обучи память.");
