@@ -1,122 +1,90 @@
-:root {
-  --bg: #111;
-  --fg: #eee;
-  --accent: #3a86ff;
-  --panel: #1b1b1b;
-  --bar: #3a86ff;
-}
-.light {
-  --bg: #fafafa;
-  --fg: #111;
-  --accent: #0059ff;
-  --panel: #ffffff;
-  --bar: #0059ff;
+/* ====== Base ====== */
+html, body { height: 100%; }
+:root{
+  --r: 12px;
+  --userBubble: rgba(255,255,255,.15);
+  --botBubble : rgba(255,255,255,.07);
+  --console-h: 220px;
+  --console-h-min: 120px;
 }
 
-* { box-sizing: border-box; }
-html, body {
-  margin: 0;
-  height: 100%;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: system-ui,-apple-system,'Segoe UI',Roboto;
+body{
+  background: radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
+  color:#fff;
+  font-family: system-ui, Arial, sans-serif;
+}
+body.dark{
+  background: radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
+  color:#fff;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--panel);
-  border-bottom: 1px solid #333;
-}
-.topbar h1 {
-  margin: 0;
-  font-size: 1rem;
-  flex: 1 1 auto;
-}
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--panel);
-  border-bottom: 1px solid #333;
-}
-.inline {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.85rem;
+/* ====== Glass ====== */
+.glass{
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--r);
 }
 
-.content {
-  padding: 12px;
-  overflow: auto;
-  height: calc(60vh - 120px); /* чтобы консоль была снизу */
-}
-textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 120px;
-  background: var(--panel);
-  border: 1px solid #444;
-  color: var(--fg);
-  border-radius: 6px;
-  padding: 8px;
-  font-size: 0.95rem;
-}
-.progress {
-  width: 100%;
-  height: 6px;
-  background: #333;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-.bar { height: 100%; background: var(--bar); transition: width .2s linear; }
-
-button, select, input {
-  background: var(--panel);
-  color: var(--fg);
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 0.9rem;
-}
-button:hover { border-color: var(--accent); cursor: pointer; }
-
-.console {
-  position: relative;
-  background: #000;
-  color: #0f0;
-  height: 40vh;
-  overflow: auto;
-  border-top: 2px solid #333;
-  touch-action: none;
-}
-.console.fullscreen {
-  height: calc(100vh - 56px);
-}
-.grip {
-  position: absolute;
-  top: 0;
-  left: 0; right: 0;
-  height: 8px;
-  background: var(--accent);
-  cursor: ns-resize;
-  opacity: .4;
-}
-pre {
-  margin: 0;
-  padding: 12px;
-  font-size: 14px;
-  line-height: 1.35;
-  white-space: pre-wrap;
-  word-break: break-word;
+.navbar{
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,.25);
 }
 
-@media (max-width: 600px) {
-  .content { height: auto; }
-  .console { height: 50vh; }
+/* menu btn */
+.menu-btn{
+  background:none;border:none;color:#fff;
+  padding:4px 8px;border-radius:var(--r);
+}
+.menu-btn:hover{background:rgba(255,255,255,.1);}
+
+/* ====== Chat ====== */
+.chat{ display:flex; flex-direction:column; gap:10px; padding:4px 0; }
+.msg{
+  padding:6px 10px; border-radius:var(--r);
+  white-space:pre-wrap; word-break:break-word; line-height:1.4; font-size:14px;
+}
+.msg.you{background:var(--userBubble);}
+.msg.ai {background:var(--botBubble);}
+.msg.sys{background:rgba(255,255,255,.05);font-style:italic;}
+.msg.err{background:rgba(255,0,0,.2);}
+
+/* scroll */
+.chat::-webkit-scrollbar{width:6px;}
+.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:3px}
+
+/* textarea soft */
+.soft{
+  background:rgba(255,255,255,.08)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.2)!important;
+}
+.soft:focus{
+  background:rgba(255,255,255,.12)!important;
+  color:#fff!important;
+}
+
+/* ====== Bottom console ====== */
+.console-panel{
+  position:fixed; left:0; right:0; bottom:0;
+  height:var(--console-h); max-height:100vh;
+  display:flex; flex-direction:column;
+  z-index:1030; overflow:hidden;
+}
+.console-handle{
+  height:12px; cursor:ns-resize; touch-action:none;
+  display:flex; align-items:center; justify-content:center;
+}
+.console-handle::before{
+  content:""; width:48px; height:4px; border-radius:2px;
+  background:rgba(255,255,255,.35);
+}
+.console-panel .chat{
+  flex:1 1 auto; overflow-y:auto; padding:8px 12px;
+}
+
+/* mobile: стартовая высота больше */
+@media (max-width:480px){
+  :root{ --console-h: 50vh; }
 }
