@@ -1,126 +1,129 @@
-/* ===== GLOBAL ===== */
-html,body{height:100%;margin:0}
-body{
-  background:radial-gradient(circle at 20% 20%,#4e54c8 0%,#192f6a 100%);
-  color:#fff;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+:root {
+  --bg: #111;
+  --fg: #eee;
+  --accent: #3a86ff;
+  --danger: #ff006e;
+  --bar: #3a86ff;
+  --panel: #1b1b1b;
 }
-body.dark{background:radial-gradient(circle at 20% 20%,#0f0f26 0%,#000 100%)}
-.hidden{display:none!important}
-.d-none{display:none!important}
-
-/* ===== NAVBAR ===== */
-.navbar{
-  display:flex;align-items:center;gap:12px;padding:6px 10px;
-  background:rgba(0,0,0,.35);backdrop-filter:blur(6px);
-  border-bottom:1px solid #888;
-}
-.brand{font-weight:700;font-size:1.1rem}
-.badge{background:#ffa500;color:#000;padding:2px 6px;border-radius:6px;font-size:.8rem}
-.menu-btn{
-  margin-left:auto;width:40px;height:40px;background:transparent;
-  border:1px solid #fff;border-radius:50%;color:#fff;font-size:1.3rem;
+.light {
+  --bg: #fafafa;
+  --fg: #111;
+  --accent: #0059ff;
+  --danger: #c4004e;
+  --bar: #0059ff;
+  --panel: #ffffff;
 }
 
-/* ===== DROPDOWN ===== */
-.dropdown{
-  position:absolute;top:54px;right:10px;z-index:50;
-  background:rgba(0,0,0,.85);border-radius:8px;padding:8px 0;
-  min-width:220px;
-}
-.dropdown button{
-  display:block;width:100%;background:none;border:none;color:#fff;text-align:left;
-  font:inherit;padding:6px 14px;cursor:pointer;
-}
-.dropdown button:hover{background:rgba(255,255,255,.15)}
-.dropdown hr{border:0;border-top:1px solid #555;margin:6px 0}
-.dropdown .danger{color:#f55}
-
-/* ===== PANELS ===== */
-.panel{padding:8px 12px}
-.panel .actions{margin-top:8px;display:flex;gap:8px}
-.panel .ghost{background:none;border:1px solid rgba(255,255,255,.4);color:#fff}
-
-/* ===== INPUTS ===== */
-.soft{
-  background:transparent;border:1px solid rgba(255,255,255,.5);
-  border-radius:12px;color:#fff;font:inherit;
-}
-textarea.soft{min-height:44px;width:100%;padding:6px;resize:vertical}
-input.soft{height:38px;padding:4px 8px;width:100%}
-
-/* ===== CHAT ===== */
-.chat{
-  height:calc(100vh - 220px);overflow:auto;padding:10px;
-  display:flex;flex-direction:column;gap:8px;
-}
-.msg{
-  max-width:80%;padding:10px;border:1px solid rgba(255,255,255,.35);
-  border-radius:12px;white-space:pre-wrap;word-break:break-word;
-}
-.user{align-self:flex-end;background:rgba(255,255,255,.15)}
-.bot {align-self:flex-start;background:rgba(255,255,255,.07)}
-
-/* ===== INPUT BAR ===== */
-.inputbar{display:flex;gap:6px;padding:6px 10px;align-items:flex-end}
-.inputbar textarea{flex:1}
-.inputbar button{
-  width:54px;height:44px;background:#007bff;border:none;
-  border-radius:12px;color:#fff;font-size:1.2rem;
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
 }
 
-/* ===== GPT BADGE ===== */
-#aiIndicator{position:fixed;top:8px;right:80px;background:#00d5ff;padding:2px 6px;border-radius:6px}
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 8px;
+  background: var(--panel);
+  border-bottom: 1px solid #333;
+}
+.topbar h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  flex: 1 1 auto;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+button, select, input {
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+button:hover { border-color: var(--accent); cursor: pointer; }
 
-/* ===== Interactive Console (mobile full-screen) ===== */
-#dbgToggle{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.5);color:#fff;font-size:.8rem;
-  padding:2px 10px;border-radius:6px 6px 0 0;cursor:pointer;user-select:none;z-index:999;
+.wrap {
+  height: calc(100% - 56px);
+  display: flex;
+  flex-direction: column;
 }
-#dbgPanel{
-  position:fixed;left:0;right:0;bottom:-260px;height:250px;
-  background:rgba(0,0,0,.87);color:#0f0;font-size:.75rem;z-index:998;
-  border-top:1px solid #555;transition:bottom .25s;
-  display:flex;flex-direction:column;
+.left {
+  padding: 12px;
+  flex: 1 1 auto;
+  overflow: auto;
 }
-#dbgPanel.open{bottom:0;}
-#dbgPanel.full{top:0;bottom:0;height:100vh;border-top:none;}
-.dbg-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:4px 8px;background:#111;border-bottom:1px solid #333;color:#0ff;
-  font-size:.8rem;
+textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 120px;
+  background: var(--panel);
+  border: 1px solid #444;
+  color: var(--fg);
+  border-radius: 6px;
+  padding: 8px;
 }
-.dbg-head button{
-  background:#333;color:#0ff;border:none;border-radius:4px;padding:2px 6px;font-size:.75rem;
+.params {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+  flex-wrap: wrap;
 }
-#dbgLog{
-  flex:1;margin:0;padding:4px 6px;overflow:auto;white-space:pre-wrap;
+.progress {
+  width: 100%;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
 }
-#dbgInputRow{
-  position:relative;display:flex;gap:4px;padding:4px;background:#111;border-top:1px solid #333;
-}
-#dbgInputRow button{
-  background:#333;color:#0ff;border:none;border-radius:4px;padding:2px 6px;font-size:.75rem;
-  flex:0 0 auto;
+.bar {
+  height: 100%;
+  background: var(--bar);
+  transition: width .2s linear;
 }
 
-.dbg-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:4px 8px;background:#111;border-bottom:1px solid #333;color:#0ff;
-  font-size:.8rem;
-  cursor:ns-resize;          /* ← визуально показываем, что можно тянуть */
-  touch-action:none;         /* чтобы touchmove не скроллил страницу */
+.console {
+  position: relative;
+  background: #000;
+  color: #0f0;
+  height: 40vh;
+  overflow: auto;
+  border-top: 2px solid #333;
+  touch-action: none;
 }
-#dbgPanel.dragging{transition:none;}
-#dbgCmd{
-  flex:1 1 auto;background:#111;border:1px solid #555;color:#0f0;
-  border-radius:4px;padding:2px 4px;font-size:.75rem;
+.console.fullscreen {
+  height: calc(100vh - 56px);
 }
-/* hints */
-#dbgHints{
-  position:absolute;left:6px;right:96px;bottom:40px;
-  max-height:120px;overflow:auto;background:#000;border:1px solid #555;
-  border-radius:4px;list-style:none;margin:0;padding:2px 0;z-index:1000;
+.grip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--accent);
+  cursor: ns-resize;
+  opacity: .4;
 }
-#dbgHints li{padding:2px 6px;cursor:pointer}
-#dbgHints li.active,#dbgHints li:hover{background:#133;color:#0ff}
+pre {
+  margin: 0;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 600px) {
+  .console { height: 50vh; }
+  .topbar { flex-direction: column; align-items: flex-start; }
+}
