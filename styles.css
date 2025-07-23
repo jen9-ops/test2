@@ -1,117 +1,101 @@
-/* ===== Base ===== */
-html, body { height: 100%; }
-:root{
-  --r: 12px;
-  --userBubble: rgba(255,255,255,.15);
-  --botBubble : rgba(255,255,255,.07);
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hyper-Bot</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
-  /* нижняя консоль */
-  --console-h: 220px;
-  --console-h-min: 120px;
-}
+  <link rel="icon" href="ico.ico" />
 
-body{
-  background: radial-gradient(circle at 20% 20%, #4e54c8 0%, #192f6a 100%);
-  color: #fff;
-  font-family: system-ui, Arial, sans-serif;
-}
-body.dark{
-  background: radial-gradient(circle at 20% 20%, #0f0f26 0%, #000 100%);
-  color: #fff;
-}
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-/* ===== Glass ===== */
-.glass{
-  background: rgba(255,255,255,.08);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: var(--r);
-}
+  <link rel="stylesheet" href="styles.css">
 
-.navbar{
-  background: rgba(0,0,0,.35);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,.25);
-}
+  <!-- transformers.js (GPT-2) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body class="d-flex flex-column h-100">
 
-/* menu btn */
-.menu-btn{
-  background: none;
-  border: none;
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: var(--r);
-}
-.menu-btn:hover{ background: rgba(255,255,255,.1); }
+  <!-- NAVBAR -->
+  <header class="navbar glass shadow-sm px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+      <i class="bi bi-robot"></i> Hyper-Bot
+      <span id="progress"    class="badge bg-warning text-dark ms-1">0 %</span>
+      <span id="aiIndicator" class="badge bg-info text-dark ms-1 d-none">GPT-2</span>
+    </a>
 
-/* ===== Chat ===== */
-.chat{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  padding:4px 0;
-}
-.msg{
-  padding:6px 10px;
-  border-radius:var(--r);
-  white-space:pre-wrap;
-  word-break:break-word;
-  line-height:1.4;
-  font-size:14px;
-}
-.msg.you{ background: var(--userBubble); }
-.msg.ai { background: var(--botBubble); }
-.msg.sys{ background: rgba(255,255,255,.05); font-style: italic; }
-.msg.err{ background: rgba(255,0,0,.2); }
+    <div class="dropdown ms-auto">
+      <button class="menu-btn" data-bs-toggle="dropdown" aria-label="Меню">
+        <i class="bi bi-list fs-4"></i>
+      </button>
 
-/* scroll */
-.chat::-webkit-scrollbar{ width:6px; }
-.chat::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.3); border-radius:3px }
+      <ul class="dropdown-menu glass dropdown-menu-end p-2 shadow-lg">
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlText"><i class="bi bi-file-text me-1"></i>Обучить текстом</a></li>
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mdlURL"><i class="bi bi-link-45deg me-1"></i>Обучить URL</a></li>
+        <li><a class="dropdown-item" href="#" onclick="showAnalysis()"><i class="bi bi-bar-chart me-1"></i>Анализ</a></li>
 
-/* textarea soft */
-.soft{
-  background: rgba(255,255,255,.08)!important;
-  color:#fff!important;
-  border: 1px solid rgba(255,255,255,.2)!important;
-}
-.soft:focus{
-  background: rgba(255,255,255,.12)!important;
-  color:#fff!important;
-}
+        <li><hr class="dropdown-divider"></li>
 
-/* ===== Bottom console ===== */
-.console-panel{
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  height: var(--console-h);
-  max-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  z-index: 1030; /* под модалками bootstrap (1055) */
-  overflow: hidden;
-}
-.console-handle{
-  height: 12px;
-  cursor: ns-resize;
-  touch-action: none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.console-handle::before{
-  content:"";
-  width:48px;
-  height:4px;
-  border-radius:2px;
-  background: rgba(255,255,255,.35);
-}
-.console-panel .chat{
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding: 8px 12px;
-}
+        <li><a class="dropdown-item" href="#" onclick="exportData()"><i class="bi bi-download me-1"></i>Скачать память</a></li>
+        <li><a class="dropdown-item" href="#" onclick="document.getElementById('fileInput').click()"><i class="bi bi-upload me-1"></i>Загрузить память</a></li>
+        <li><a class="dropdown-item" href="#" onclick="clearChat()"><i class="bi bi-x-circle me-1"></i>Очистить чат</a></li>
+        <li><a class="dropdown-item text-danger" href="#" onclick="clearMemory()"><i class="bi bi-trash3 me-1"></i>Очистить память</a></li>
 
-/* mobile: стартовая высота больше */
-@media (max-width:480px){
-  :root{ --console-h: 50vh; }
-}
+        <li><hr class="dropdown-divider"></li>
+
+        <li><a class="dropdown-item" href="#" onclick="toggleTheme()"><i class="bi bi-moon-stars me-1"></i>Тёмная тема</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Можно что-то выводить здесь, сейчас пусто -->
+  <main class="flex-grow-1 d-flex flex-column p-3 overflow-auto"></main>
+
+  <!-- Нижняя растягиваемая консоль -->
+  <div id="consolePanel" class="console-panel glass">
+    <div id="consoleHandle" class="console-handle" title="Потянуть вверх/вниз"></div>
+
+    <div id="chat" class="chat flex-grow-1 overflow-auto"></div>
+
+    <div class="d-flex gap-2 p-2">
+      <textarea id="userInput" rows="2" class="form-control soft"
+                placeholder="Shift+Enter – новая строка, Ctrl+Enter – отправить"></textarea>
+      <button id="btnAsk" class="btn btn-primary">➤</button>
+    </div>
+  </div>
+
+  <input id="fileInput" type="file" accept="application/json" class="d-none" onchange="importData(event)">
+
+  <!-- MODALS -->
+  <div id="mdlText" class="modal fade">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content glass p-3">
+        <h5 class="modal-title mb-3"><i class="bi bi-pencil-square me-2"></i>Обучить по тексту</h5>
+        <textarea id="textInput" rows="6" class="form-control soft mb-3" placeholder="Вставь текст для обучения…"></textarea>
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromText()">Обучить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdlURL" class="modal fade">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content glass p-3">
+        <h5 class="modal-title mb-3"><i class="bi bi-link-45deg me-2"></i>Обучить по URL</h5>
+        <input id="urlInput" class="form-control soft mb-3" placeholder="https://пример.ru/статья">
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal" onclick="trainFromURL()">Загрузить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
