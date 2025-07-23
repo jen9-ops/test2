@@ -1,8 +1,7 @@
 "use strict";
 
-/* ---------- Shortcuts ---------- */
+/* ===== Helpers ===== */
 const $  = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
 
 const chat       = $("#chat");
 const progressEl = $("#progress");
@@ -10,7 +9,7 @@ const aiBadge    = $("#aiIndicator");
 const inputEl    = $("#userInput");
 const btnAsk     = $("#btnAsk");
 
-/* ---------- UI helpers ---------- */
+/* ===== UI ===== */
 function append(who, txt, cls="ai"){
   const el = document.createElement("div");
   el.className = `msg ${cls}`;
@@ -22,13 +21,13 @@ function append(who, txt, cls="ai"){
 function clearChat(){ chat.innerHTML = ""; }
 function toggleTheme(){ document.body.classList.toggle("dark"); }
 
-/* ---------- Memory / Markov ---------- */
+/* ===== Memory / Markov ===== */
 let sentences = [];
 let markov = new Map();
 const TARGET = 10000;
 
-function updateBar(txt){
-  if(typeof txt === "string"){ progressEl.textContent = txt; return; }
+function updateBar(str){
+  if(typeof str === "string"){ progressEl.textContent = str; return; }
   const chars = sentences.join(" ").length;
   progressEl.textContent = Math.min(100, Math.round(chars / TARGET * 100)) + " %";
 }
@@ -62,10 +61,10 @@ async function trainFromURL(){
     append("Система","Качаю текст…","sys");
     const r = await fetch(url);
     const t = await r.text();
-    const n = splitSent(t);
-    sentences.push(...n);
+    const parts = splitSent(t);
+    sentences.push(...parts);
     rebuildMarkov(); updateBar(); saveLocal();
-    append("Система", `Обучено: ${n.length} предложений`, "sys");
+    append("Система", `Обучено: ${parts.length} предложений`, "sys");
   }catch(e){
     append("Система","Не удалось скачать","err");
   }
@@ -95,7 +94,7 @@ function genMarkov(seed,max=60){
   return out[0].charAt(0).toUpperCase()+out.join(" ").slice(1)+".";
 }
 
-/* ---------- Templates ---------- */
+/* ===== Templates ===== */
 const templates = [
   {
     p:/создать vhdx (?<size>\d+(?:gb|mb)) в (?<path>.+)/i,
@@ -111,19 +110,25 @@ Mount-VHD -Path $vhd`
   { p:/показать процессы/i, f:()=>'Get-Process | Sort-Object CPU -Descending | Select -First 20' }
 ];
 
-/* ---------- GPT-2 ---------- */
+/* ===== GPT-2 ===== */
 let gpt = null;
 async function loadGPT2(){
   if(gpt) return gpt;
   aiBadge.classList.remove("d-none");
   aiBadge.textContent = "GPT-2: loading…";
 
-  window.transformers = window.transformers || {};
-  window.transformers.env = window.transformers.env || {};
-  window.transformers.env.allowLocalModels = false;
+  // Безопасные настройки для мобилок
+  const { env, pipeline } = window.transformers;
+  env.allowLocalModels = false;
+  env.backends = env.backends || {};
+  env.backends.onnx = env.backends.onnx || {};
+  env.backends.onnx.wasm = env.backends.onnx.wasm || {};
+  env.backends.onnx.wasm.numThreads = 1;
+  env.backends.onnx.wasm.proxy = true;
 
-  const { pipeline } = window.transformers;
-  gpt = await pipeline("text-generation","Xenova/distilgpt2",{
+  const MODEL_ID = "Xenova/gpt2-tiny";
+
+  gpt = await pipeline("text-generation", MODEL_ID, {
     progress_callback:d=>{
       if(d.status==="progress" && d.total){
         updateBar(`Модель: ${Math.round(d.loaded/d.total*100)} %`);
@@ -136,7 +141,7 @@ async function loadGPT2(){
   return gpt;
 }
 
-/* ---------- Ask ---------- */
+/* ===== ASK ===== */
 async function ask(){
   const q = inputEl.value.trim();
   if(!q) return;
@@ -159,19 +164,22 @@ async function ask(){
     const pipe = await loadGPT2();
     aiBadge.classList.remove("d-none");
     aiBadge.textContent = "GPT-2";
+
     const out = await pipe(q,{
       max_new_tokens: 160,
       temperature: 0.9,
       top_p: 0.95,
       repetition_penalty: 1.15
     });
+
     let txt = out[0].generated_text;
     if(txt.startsWith(q)) txt = txt.slice(q.length).trimStart();
     append("ИИ", txt || "(пусто)", "ai");
     return;
   }catch(e){
     console.error(e);
-    append("Система","GPT-2 не доступна, fallback → Markov","sys");
+    append("Система","GPT-2 ошибка: " + (e?.message || e), "err");
+    append("Система","fallback → Markov","sys");
   }
 
   // 3. Markov fallback
@@ -181,10 +189,10 @@ async function ask(){
   append("ИИ", genMarkov(seed) || "Обучи меня текстом.", "ai");
 }
 
-/* ---------- Analysis / Export ---------- */
+/* ===== Analysis / Export ===== */
 function showAnalysis(){
   const freq = new Map();
-  sentences.forEach(s=>splitWords(s).forEach(w=>{
+  sentences.forEach(s => splitWords(s).forEach(w=>{
     freq.set(w,(freq.get(w)||0)+1);
   }));
   const top = [...freq.entries()].sort((a,b)=>b[1]-a[1]).slice(0,50)
@@ -213,11 +221,12 @@ function importData(e){
 }
 function clearMemory(){
   if(confirm("Точно очистить память?")){
-    sentences = []; markov.clear(); saveLocal(); updateBar(); append("Система","Память очищена","sys");
+    sentences=[]; markov.clear(); saveLocal(); updateBar();
+    append("Система","Память очищена","sys");
   }
 }
 
-/* ---------- Bottom panel drag ---------- */
+/* ===== Draggable console ===== */
 (function(){
   const panel  = $("#consolePanel");
   const handle = $("#consoleHandle");
@@ -233,7 +242,9 @@ function clearMemory(){
   };
 
   handle.addEventListener('pointerdown', e=>{
-    isDrag=true; startY=e.clientY; startH=panel.offsetHeight;
+    isDrag = true;
+    startY = e.clientY;
+    startH = panel.offsetHeight;
     handle.setPointerCapture(e.pointerId);
   });
   handle.addEventListener('pointermove', e=>{
@@ -242,9 +253,11 @@ function clearMemory(){
     setH(startH + dy);
   });
   handle.addEventListener('pointerup', e=>{
-    isDrag=false; handle.releasePointerCapture(e.pointerId);
+    isDrag = false;
+    handle.releasePointerCapture(e.pointerId);
   });
 
+  // двойной тап/клик
   handle.addEventListener('click', ()=>{
     const now = Date.now();
     if(now - lastTap < 300){
@@ -261,18 +274,20 @@ function clearMemory(){
   });
 })();
 
-/* ---------- Bindings ---------- */
+/* ===== Bindings ===== */
 btnAsk.addEventListener("click", ask);
 inputEl.addEventListener("keydown", e=>{
-  if(e.key==="Enter" && e.ctrlKey){ e.preventDefault(); ask(); }
+  if(e.key === "Enter" && e.ctrlKey){
+    e.preventDefault(); ask();
+  }
 });
 
-/* expose for menu */
+/* expose funcs to window (для меню) */
 Object.assign(window,{
   trainFromText, trainFromURL, showAnalysis,
   exportData, importData, clearMemory,
   clearChat, ask, toggleTheme
 });
 
-/* first render */
+/* First render */
 updateBar();
