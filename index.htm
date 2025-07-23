@@ -7,50 +7,45 @@
   <link rel="icon" href="./Ico.ico" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body>
+<body class="classic">
   <header class="topbar">
     <h1 id="title">Hyper-Bot <span id="progress-label">0%</span></h1>
-    <div class="controls">
-      <button id="btn-train-text">Обучить текстом</button>
-      <button id="btn-train-url">Обучить URL</button>
-      <button id="btn-generate">Сгенерировать</button>
-      <button id="btn-save-mem">Скачать память</button>
-      <button id="btn-reset">Сброс</button>
-      <select id="model-select" title="Модель">
-        <option value="Xenova/gpt2">GPT-2</option>
-        <option value="Xenova/distilgpt2">DistilGPT-2</option>
-      </select>
-      <button id="btn-theme">🌓</button>
-      <button id="btn-clear-log">🗑</button>
-    </div>
+    <button id="btn-theme" title="Тема">🌓</button>
+    <button id="btn-clear-log" title="Очистить лог">🗑</button>
   </header>
 
-  <main class="wrap">
-    <section class="left">
-      <textarea id="input" placeholder="Введи подсказку (prompt)..." rows="6"></textarea>
-      <div class="params">
-        <label>Макс. токенов:
-          <input id="max-tokens" type="number" min="1" max="512" value="128">
-        </label>
-        <label>Температура:
-          <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.7">
-        </label>
-      </div>
-      <div class="progress">
-        <div id="progress-bar" class="bar" style="width:0%"></div>
-      </div>
-    </section>
+  <section class="toolbar">
+    <button id="btn-train-text">Обучить текстом</button>
+    <button id="btn-train-url">Обучить URL</button>
+    <button id="btn-generate">Сгенерировать</button>
+    <button id="btn-save-mem">Скачать память</button>
+    <button id="btn-reset">Сброс</button>
+    <select id="model-select" title="Модель">
+      <option value="Xenova/gpt2">GPT-2</option>
+      <option value="Xenova/distilgpt2">DistilGPT-2</option>
+    </select>
+    <label class="inline">Макс. токенов
+      <input id="max-tokens" type="number" min="1" max="512" value="128">
+    </label>
+    <label class="inline">Температура
+      <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.7">
+    </label>
+  </section>
 
-    <section id="console" class="console">
-      <div id="console-grip" class="grip"></div>
-      <pre id="log"></pre>
-    </section>
-  </main>
+  <section class="content">
+    <textarea id="input" placeholder="Введи подсказку (prompt)..." rows="6"></textarea>
+    <div class="progress">
+      <div id="progress-bar" class="bar" style="width:0%"></div>
+    </div>
+  </section>
+
+  <section id="console" class="console">
+    <div id="console-grip" class="grip" title="Потяни или двойной клик"></div>
+    <pre id="log"></pre>
+  </section>
 
   <!-- Скрипты -->
-  <!-- app.js — модуль -->
   <script type="module" src="./app.js" defer></script>
-  <!-- client.js — если хочешь что-то вынести отдельно -->
   <script src="./client.js" defer></script>
 </body>
 </html>
