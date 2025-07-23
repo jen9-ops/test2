@@ -1,161 +1,278 @@
-import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/dist/transformers.min.js";
+"use strict";
 
-const $ = (sel) => document.querySelector(sel);
-const logEl = $("#log");
-const progBar = $("#progress-bar");
-const progLabel = $("#progress-label");
-const consoleBox = $("#console");
-const grip = $("#console-grip");
+/* ---------- Shortcuts ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
 
-let pipe = null;
-let memory = [];
-let isDark = true;
+const chat       = $("#chat");
+const progressEl = $("#progress");
+const aiBadge    = $("#aiIndicator");
+const inputEl    = $("#userInput");
+const btnAsk     = $("#btnAsk");
 
-function log(...args) {
-  const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
-  const time = new Date().toLocaleTimeString();
-  logEl.textContent += `[${time}] ${msg}\n`;
-  logEl.scrollTop = logEl.scrollHeight;
+/* ---------- UI helpers ---------- */
+function append(who, txt, cls="ai"){
+  const el = document.createElement("div");
+  el.className = `msg ${cls}`;
+  el.textContent = `${who}: ${txt}`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
 }
-function setProgress(p) {
-  const pct = Math.min(100, Math.max(0, Math.floor(p)));
-  progBar.style.width = pct + "%";
-  progLabel.textContent = pct + "%";
-}
-function saveFile(name, dataStr) {
-  const blob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name; a.click();
-  URL.revokeObjectURL(url);
-}
-function toggleTheme() {
-  isDark = !isDark;
-  document.documentElement.classList.toggle('light', !isDark);
+function clearChat(){ chat.innerHTML = ""; }
+function toggleTheme(){ document.body.classList.toggle("dark"); }
+
+/* ---------- Memory / Markov ---------- */
+let sentences = [];
+let markov = new Map();
+const TARGET = 10000;
+
+function updateBar(txt){
+  if(typeof txt === "string"){ progressEl.textContent = txt; return; }
+  const chars = sentences.join(" ").length;
+  progressEl.textContent = Math.min(100, Math.round(chars / TARGET * 100)) + " %";
 }
 
-async function loadModel() {
-  const modelName = $("#model-select").value;
-  log(`🔄 Загружаю модель: ${modelName} ...`);
-  setProgress(0);
+function saveLocal(){ localStorage.setItem("hb.sentences", JSON.stringify(sentences)); }
+function loadLocal(){
+  try{
+    const arr = JSON.parse(localStorage.getItem("hb.sentences") || "[]");
+    if(Array.isArray(arr)) sentences = arr;
+  }catch{}
+  rebuildMarkov(); updateBar();
+}
+loadLocal();
 
-  pipe = await pipeline("text-generation", modelName, {
-    progress_callback: (p) => {
-      if (p && p.total) {
-        setProgress((p.loaded / p.total) * 100);
+const splitSent  = t => t.split(/[.!?\r?\n]+/).map(s=>s.trim()).filter(Boolean);
+const splitWords = s => s.toLowerCase().split(/[^\p{L}0-9]+/u).filter(Boolean);
+
+function trainFromText(){
+  const txt = $("#textInput").value.trim();
+  if(!txt) return;
+  const parts = splitSent(txt);
+  if(!parts.length) return;
+  sentences.push(...parts);
+  rebuildMarkov(); updateBar(); saveLocal();
+  append("Система", `Обучено: ${parts.length} предложений`, "sys");
+}
+async function trainFromURL(){
+  const url = $("#urlInput").value.trim();
+  if(!url) return;
+  try{
+    append("Система","Качаю текст…","sys");
+    const r = await fetch(url);
+    const t = await r.text();
+    const n = splitSent(t);
+    sentences.push(...n);
+    rebuildMarkov(); updateBar(); saveLocal();
+    append("Система", `Обучено: ${n.length} предложений`, "sys");
+  }catch(e){
+    append("Система","Не удалось скачать","err");
+  }
+}
+
+function rebuildMarkov(){
+  markov.clear();
+  for(const s of sentences){
+    const w = splitWords(s);
+    for(let i=0;i<w.length-1;i++){
+      if(!markov.has(w[i])) markov.set(w[i], []);
+      markov.get(w[i]).push(w[i+1]);
+    }
+  }
+}
+function genMarkov(seed,max=60){
+  const keys = [...markov.keys()];
+  let w = seed || (keys.length? keys[Math.floor(Math.random()*keys.length)] : "");
+  if(!w) return "";
+  const out=[];
+  for(let i=0;i<max;i++){
+    out.push(w);
+    const arr = markov.get(w);
+    if(!arr || !arr.length) break;
+    w = arr[Math.floor(Math.random()*arr.length)];
+  }
+  return out[0].charAt(0).toUpperCase()+out.join(" ").slice(1)+".";
+}
+
+/* ---------- Templates ---------- */
+const templates = [
+  {
+    p:/создать vhdx (?<size>\d+(?:gb|mb)) в (?<path>.+)/i,
+    f:({size,path})=>`# VHDX
+$vhd = "${path.replace(/\\$/,'')}\\VirtualFleshDrive.vhdx"
+New-VHD -Path $vhd -SizeBytes ${size.toUpperCase()} -Dynamic
+Mount-VHD -Path $vhd`
+  },
+  {
+    p:/зашифровать диск (?<letter>[a-z]):?\s*с ключом в (?<keyPath>.+)/i,
+    f:({letter,keyPath})=>`Enable-BitLocker -MountPoint "${letter.toUpperCase()}:\" -RecoveryKeyPath "${keyPath}" -EncryptionMethod XtsAes256`
+  },
+  { p:/показать процессы/i, f:()=>'Get-Process | Sort-Object CPU -Descending | Select -First 20' }
+];
+
+/* ---------- GPT-2 ---------- */
+let gpt = null;
+async function loadGPT2(){
+  if(gpt) return gpt;
+  aiBadge.classList.remove("d-none");
+  aiBadge.textContent = "GPT-2: loading…";
+
+  window.transformers = window.transformers || {};
+  window.transformers.env = window.transformers.env || {};
+  window.transformers.env.allowLocalModels = false;
+
+  const { pipeline } = window.transformers;
+  gpt = await pipeline("text-generation","Xenova/distilgpt2",{
+    progress_callback:d=>{
+      if(d.status==="progress" && d.total){
+        updateBar(`Модель: ${Math.round(d.loaded/d.total*100)} %`);
       }
-      if (p.status) log(`[dl] ${p.status}: ${p.file || ''} (${p.loaded}/${p.total})`);
     }
   });
 
-  setProgress(100);
-  log("✅ Модель загружена");
+  aiBadge.textContent = "GPT-2";
+  updateBar();
+  return gpt;
 }
 
-async function onGenerate() {
-  if (!pipe) await loadModel();
+/* ---------- Ask ---------- */
+async function ask(){
+  const q = inputEl.value.trim();
+  if(!q) return;
+  inputEl.value = "";
+  append("Ты", q, "you");
 
-  const prompt = $("#input").value.trim();
-  if (!prompt) return log("⚠ Введи текст для генерации.");
+  // 1. Templates
+  for(const t of templates){
+    const m = q.match(t.p);
+    if(m){
+      aiBadge.classList.remove("d-none");
+      aiBadge.textContent = "TEMPLATE";
+      append("ИИ", t.f(m.groups||{}), "ai");
+      return;
+    }
+  }
 
-  const maxTokens = +$("#max-tokens").value || 128;
-  const temperature = +$("#temperature").value || 0.7;
-
-  log(`🧠 Генерация... (max_tokens=${maxTokens}, temp=${temperature})`);
-  try {
-    const out = await pipe(prompt, {
-      max_new_tokens: maxTokens,
-      temperature
+  // 2. GPT-2
+  try{
+    const pipe = await loadGPT2();
+    aiBadge.classList.remove("d-none");
+    aiBadge.textContent = "GPT-2";
+    const out = await pipe(q,{
+      max_new_tokens: 160,
+      temperature: 0.9,
+      top_p: 0.95,
+      repetition_penalty: 1.15
     });
-    const text = Array.isArray(out) ? out[0].generated_text : out.generated_text;
-    log(`ИИ: ${text}`);
-  } catch (e) {
+    let txt = out[0].generated_text;
+    if(txt.startsWith(q)) txt = txt.slice(q.length).trimStart();
+    append("ИИ", txt || "(пусто)", "ai");
+    return;
+  }catch(e){
     console.error(e);
-    log("❌ Ошибка генерации", e);
+    append("Система","GPT-2 не доступна, fallback → Markov","sys");
+  }
+
+  // 3. Markov fallback
+  aiBadge.classList.remove("d-none");
+  aiBadge.textContent = "MARKOV";
+  const seed = splitWords(q)[0];
+  append("ИИ", genMarkov(seed) || "Обучи меня текстом.", "ai");
+}
+
+/* ---------- Analysis / Export ---------- */
+function showAnalysis(){
+  const freq = new Map();
+  sentences.forEach(s=>splitWords(s).forEach(w=>{
+    freq.set(w,(freq.get(w)||0)+1);
+  }));
+  const top = [...freq.entries()].sort((a,b)=>b[1]-a[1]).slice(0,50)
+               .map(([w,c])=>`${w} — ${c}`).join("\n");
+  alert(`Всего предложений: ${sentences.length}\nТоп слов:\n${top}`);
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(sentences)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hyper-bot-data.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importData(e){
+  const f = e.target.files[0]; if(!f) return;
+  f.text().then(t=>{
+    try{
+      const arr = JSON.parse(t);
+      if(Array.isArray(arr)){
+        sentences = arr; rebuildMarkov(); updateBar(); saveLocal();
+        append("Система","База загружена","sys");
+      }else alert("Неверный формат");
+    }catch{ alert("Ошибка файла"); }
+  });
+}
+function clearMemory(){
+  if(confirm("Точно очистить память?")){
+    sentences = []; markov.clear(); saveLocal(); updateBar(); append("Система","Память очищена","sys");
   }
 }
 
-function onTrainText() {
-  const txt = prompt("Вставь обучающий текст:");
-  if (!txt) return;
-  memory.push({ type: "text", data: txt, ts: Date.now() });
-  log(`📥 Текст добавлен в память (${txt.length} симв.)`);
-}
+/* ---------- Bottom panel drag ---------- */
+(function(){
+  const panel  = $("#consolePanel");
+  const handle = $("#consoleHandle");
+  if(!panel || !handle) return;
 
-async function onTrainURL() {
-  const url = prompt("Вставь URL:");
-  if (!url) return;
-  log(`🌐 Скачиваю ${url}...`);
-  try {
-    const res = await fetch(url);
-    const t = await res.text();
-    memory.push({ type: "url", url, data: t, ts: Date.now() });
-    log(`📥 Контент с ${url} добавлен (${t.length} симв.)`);
-  } catch (e) {
-    log("❌ Не удалось получить URL", e);
-  }
-}
+  let startY=0,startH=0,isDrag=false,lastTap=0;
 
-function onSaveMemory() {
-  if (!memory.length) return log("⚠ Память пуста");
-  saveFile("memory.json", JSON.stringify(memory, null, 2));
-  log("💾 Память выгружена -> memory.json");
-}
-
-function onReset() {
-  memory = [];
-  logEl.textContent = "";
-  setProgress(0);
-  pipe = null;
-  log("♻ Сброс: модель выгружена, память очищена.");
-}
-function onClearLog() { logEl.textContent = ""; }
-
-// Drag console
-(function initDrag() {
-  let startY = 0;
-  let startHeight = 0;
-  let dragging = false;
-
-  const down = (e) => {
-    dragging = true;
-    startY = e.clientY || e.touches?.[0]?.clientY;
-    startHeight = consoleBox.offsetHeight;
-    e.preventDefault();
+  const setH = h=>{
+    const max = window.innerHeight;
+    const min = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--console-h-min'))||120;
+    h = Math.min(max, Math.max(min, h));
+    document.documentElement.style.setProperty('--console-h', h + 'px');
   };
-  const move = (e) => {
-    if (!dragging) return;
-    const y = e.clientY || e.touches?.[0]?.clientY;
-    const diff = startY - y;
-    let newH = startHeight + diff;
-    newH = Math.min(window.innerHeight - 56, Math.max(80, newH));
-    consoleBox.style.height = newH + "px";
-  };
-  const up = () => { dragging = false; };
 
-  grip.addEventListener("mousedown", down);
-  grip.addEventListener("touchstart", down, { passive: false });
-  window.addEventListener("mousemove", move);
-  window.addEventListener("touchmove", move, { passive: false });
-  window.addEventListener("mouseup", up);
-  window.addEventListener("touchend", up);
+  handle.addEventListener('pointerdown', e=>{
+    isDrag=true; startY=e.clientY; startH=panel.offsetHeight;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', e=>{
+    if(!isDrag) return;
+    const dy = startY - e.clientY;
+    setH(startH + dy);
+  });
+  handle.addEventListener('pointerup', e=>{
+    isDrag=false; handle.releasePointerCapture(e.pointerId);
+  });
+
+  handle.addEventListener('click', ()=>{
+    const now = Date.now();
+    if(now - lastTap < 300){
+      const curH = panel.offsetHeight;
+      if(curH < window.innerHeight*0.9) setH(window.innerHeight);
+      else setH(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--console-h-min'))||120);
+    }
+    lastTap = now;
+  });
+
+  window.addEventListener('resize', ()=>{
+    const curH = panel.offsetHeight;
+    if(curH > window.innerHeight) setH(window.innerHeight);
+  });
 })();
 
-grip.addEventListener("dblclick", () => {
-  consoleBox.classList.toggle("fullscreen");
+/* ---------- Bindings ---------- */
+btnAsk.addEventListener("click", ask);
+inputEl.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.ctrlKey){ e.preventDefault(); ask(); }
 });
 
-$("#btn-generate").addEventListener("click", onGenerate);
-$("#btn-train-text").addEventListener("click", onTrainText);
-$("#btn-train-url").addEventListener("click", onTrainURL);
-$("#btn-save-mem").addEventListener("click", onSaveMemory);
-$("#btn-reset").addEventListener("click", onReset);
-$("#btn-theme").addEventListener("click", toggleTheme);
-$("#btn-clear-log").addEventListener("click", onClearLog);
-$("#model-select").addEventListener("change", () => {
-  pipe = null;
-  setProgress(0);
-  log("🔁 Модель будет перезагружена при следующей генерации.");
+/* expose for menu */
+Object.assign(window,{
+  trainFromText, trainFromURL, showAnalysis,
+  exportData, importData, clearMemory,
+  clearChat, ask, toggleTheme
 });
 
-log("Привет! Старый дизайн возвращён. Жми «Сгенерировать» или обучи память.");
+/* first render */
+updateBar();
